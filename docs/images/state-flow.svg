@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" width="960" height="460" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
+  <title>무단횡단 방지 시스템 동작 상태 흐름도</title>
+  <rect x="0" y="0" width="960" height="460" fill="#ffffff"/>
+  <text x="24" y="40" font-size="22" font-weight="bold" fill="#111827">동작 상태 흐름도 (대기 ↔ 경고)</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="60" y="150" width="260" height="140" rx="12" fill="#f1f5f9" stroke="#334155" stroke-width="2"/>
+  <text x="190" y="190" font-size="20" font-weight="bold" fill="#0f172a" text-anchor="middle">대기 상태</text>
+  <text x="190" y="220" font-size="13" fill="#334155" text-anchor="middle">부저 OFF · 빨간 LED OFF</text>
+  <text x="190" y="242" font-size="13" fill="#334155" text-anchor="middle">스트립 2개 모두 소등</text>
+  <text x="190" y="268" font-size="12" fill="#64748b" text-anchor="middle">보행자가 인도 위를 정상 이동</text>
+
+  <rect x="640" y="150" width="260" height="140" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="770" y="190" font-size="20" font-weight="bold" fill="#7f1d1d" text-anchor="middle">경고 상태</text>
+  <text x="770" y="220" font-size="13" fill="#991b1b" text-anchor="middle">부저 삐- 쉬고 삐- (2000Hz)</text>
+  <text x="770" y="242" font-size="13" fill="#991b1b" text-anchor="middle">빨간 LED 점멸 (300ms)</text>
+  <text x="770" y="264" font-size="13" fill="#991b1b" text-anchor="middle">스트립 혜성 애니메이션</text>
+
+  <path d="M320 195 H640" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="480" y="150" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">발동</text>
+  <text x="480" y="175" font-size="13" fill="#334155" text-anchor="middle">진입 IR 쌍(D2/D3) 감지 · 120ms 유지</text>
+  <text x="480" y="188" font-size="13" fill="#334155" text-anchor="middle">또는 빨간 버튼(D10)</text>
+
+  <path d="M640 250 H320" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="480" y="278" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">종결</text>
+  <text x="480" y="300" font-size="13" fill="#334155" text-anchor="middle">통과 IR 쌍(D4/D5) 감지 · 200ms 유지</text>
+  <text x="480" y="320" font-size="13" fill="#334155" text-anchor="middle">또는 초록 버튼(D11)</text>
+  <text x="480" y="340" font-size="13" fill="#334155" text-anchor="middle">또는 60초 경과 시 자동 복귀</text>
+
+  <rect x="60" y="370" width="840" height="56" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+  <text x="480" y="395" font-size="13" font-weight="bold" fill="#92400e" text-anchor="middle">경고 시작 후 최소 3초(WARNING_MIN_MS) 동안은 종료 신호를 무시합니다.</text>
+  <text x="480" y="415" font-size="12" fill="#b45309" text-anchor="middle">진입 센서가 통과 센서까지 함께 건드려 경고가 곧바로 꺼지는 것을 막기 위한 장치입니다.</text>
+</svg>
