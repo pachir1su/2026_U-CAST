@@ -8,25 +8,64 @@
    최종 발표용 회로는 IR 센서를 4개(진입 2 + 통과 2) 씁니다. 그 기준 스케치는
    저장소 루트의 `main.ino`이며, 이 파일은 그것을 대체하지 않습니다.
 
-   지금은 IR 센서가 2개뿐이라, **가진 부품만으로 먼저 조립하고 알고리즘을 확인**
-   하려고 만든 축소판입니다.
+   지금은 IR 센서가 2개뿐이고 버튼도 아직 없으며 스트립도 1줄뿐이므로,
+   **가진 부품만으로 조립하고 동작을 확인**하려고 만든 축소판입니다.
+   (최종 구성은 IR 4개 + 스트립 2줄 + 버튼 2개입니다.)
 
-     - 진입 감지 IR 1개 → D2 (`main.ino`의 진입 IR 1과 같은 핀)
-     - 통과 감지 IR 1개 → D3 (`main.ino`에서는 진입 IR 2가 쓰던 핀)
+   [지금 배선 — 실물 브레드보드 기준]
 
-   나머지 부품(스트립 1줄, 빨간 LED, 부저, 버튼 2개)은 `main.ino`와 핀이 완전히
-   같습니다. 그래서 IR 센서 2개를 더 구해 D3의 통과 IR을 D4로 옮기고 D3·D5에
-   센서를 추가한 뒤 `main.ino`를 올리면, 나머지 배선은 그대로 두고 최종 구성이
-   됩니다.
+     왼쪽 연석 IR   OUT → D8
+     오른쪽 연석 IR OUT → D10
+     빨간 경고 LED     → D3  (220~330Ω 직렬)
+     네오픽셀 스트립 DIN → D4  (330~470Ω 직렬 권장)
+     부저          (+) → D5
+     빨간 버튼(선택)    → A0  ↔ GND
+     초록 버튼(선택)    → A1  ↔ GND
 
-   상태 전이 규칙과 동시 입력 정책은 `main.ino`와 완전히 같습니다.
+   각 IR 모듈은 `VCC` → 5V, `GND` → GND도 함께 연결합니다.
+   A0·A1은 디지털 입력으로 사용합니다(우노에서 가능합니다).
+   D0·D1은 시리얼 통신에 쓰이므로 아무것도 연결하지 않습니다.
+
+   [센서를 4개로 늘릴 때]
+   비어 있는 **D9(왼쪽 IR 2)** 와 **D11(오른쪽 IR 2)** 에 새 센서를 꽂기만 하면
+   됩니다. 기존 선은 하나도 옮기지 않고 `main.ino`를 업로드하면 최종 구성이 됩니다.
+   (두 번째 스트립 핀은 `main.ino`의 `PIN_STRIP_2`에서 직접 정합니다.)
+
+   ────────────────────────────────────────────────────────────────────────────
+   ⚠ [중요] IR 센서 두 개를 서로 마주보게 두지 마세요
+
+   이 프로젝트가 쓰는 FC-51 / HW-201 계열 모듈은 **한 보드에 송신 LED(투명)와
+   수신 LED(검정)가 같이 붙어 있는 "반사형 장애물 감지" 모듈**입니다.
+   앞으로 쏜 적외선이 물체에 맞고 **되돌아오는 것**을 감지합니다.
+   빔이 끊기는 것을 보는 송수신 분리형(브레이크빔)이 아닙니다.
+
+   두 개를 마주보게 두면 한쪽의 송신 LED가 반대쪽 수신부에 그대로 꽂혀서,
+   손을 대지 않아도 **계속 감지 상태로 붙어버립니다.** 그러면 아래 모호 입력
+   보호(IR_AMBIGUITY_GUARD)에 걸려 아무 일도 일어나지 않습니다.
+
+     올바름:  도로를 사이에 둔 양쪽 연석에, 둘 다 보행자가 지나갈 쪽을 향해 설치
+     잘못됨:  두 센서를 도로 건너 서로 마주보게 설치 (서로 간섭해서 안 됨)
+
+   센서 위의 파란 가변저항으로 감지 거리를 조절합니다(대략 2~30cm).
+   아무것도 없는데 감지된다고 나오면 거리를 줄이는 쪽으로 돌리세요.
+   ────────────────────────────────────────────────────────────────────────────
+
+   [동작] — 양방향
+
+   어느 쪽에서 출발하든 똑같이 동작합니다.
+
+     [대기]  왼쪽(D8)이 먼저 감지    →  [경고 중]  (도착 쪽 = 오른쪽으로 기억)
+     [대기]  오른쪽(D10)이 먼저 감지 →  [경고 중]  (도착 쪽 = 왼쪽으로 기억)
+
+     [경고 중]  기억해 둔 반대쪽이 감지 →  [대기]
+     [경고 중]  출발한 쪽이 다시 감지   →  경고 유지
+
+   경고 중에는 스트립(D4)이 전체 빨간색으로 켜지고, 빨간 LED(D3)와 부저(D5)가
+   같은 주기로 점멸합니다. 버튼이 없으므로 도착 신호가 없어도
+   WARNING_TIMEOUT_MS 뒤에 자동으로 꺼집니다.
+
+   상태 전이 규칙은 `main.ino`와 같습니다.
    **알고리즘을 바꿀 때는 두 파일을 함께 고쳐야 합니다.**
-
-   [동작]
-   1) 대기 상태에서 진입 IR(D2)이 감지되거나 빨간 버튼(A0)을 누르면 경고를 시작한다.
-   2) 경고 중에는 네오픽셀 스트립이 전체 빨간색으로 켜지고,
-      운전자 경고용 빨간 LED(D8)와 부저(D9)가 같은 주기로 점멸한다.
-   3) 통과 IR(D3)이 감지되거나 초록 버튼(A1)을 누르면 모든 출력을 끄고 대기로 돌아간다.
 
    ※ 조정값은 아래 [설정] 구역의 상수만 수정합니다.
    ※ 이 파일은 반드시 `test/` 폴더 안에 두어야 합니다. Arduino IDE는 한 스케치
@@ -39,28 +78,35 @@
 #include <Adafruit_NeoPixel.h>
 
 /* ---------------------------------------------------------------------------
-   [설정 1] 핀 번호
-   IR 2개를 제외하면 `main.ino`와 같은 배정입니다.
+   [설정 1] 핀 번호 — 지금 브레드보드에 꽂혀 있는 그대로입니다.
    --------------------------------------------------------------------------- */
-const uint8_t PIN_IR_ENTRY = 8;   // 진입 감지 IR 센서 1개
-const uint8_t PIN_IR_EXIT  = 9;   // 통과(도착) 감지 IR 센서 1개
-const uint8_t PIN_STRIP    = 4;   // 네오픽셀 LED 스트립 DIN (1줄)
-const uint8_t PIN_WARN_LED = 3;   // 운전자 경고용 빨간 LED(표지판 LED)
-const uint8_t PIN_BUZZER   = 5;   // 경고용 부저
-const uint8_t PIN_BTN_START = A4; // 빨간 버튼: 경고 수동 시작
-const uint8_t PIN_BTN_STOP  = A5; // 초록 버튼: 경고 수동 종료
+const uint8_t PIN_IR_LEFT   = 8;   // 왼쪽 연석 IR 센서 OUT
+const uint8_t PIN_IR_RIGHT  = 10;  // 오른쪽 연석 IR 센서 OUT
+const uint8_t PIN_WARN_LED  = 3;   // 운전자 경고용 빨간 LED
+const uint8_t PIN_STRIP     = 4;   // 네오픽셀 LED 스트립 DIN (1줄)
+const uint8_t PIN_BUZZER    = 5;   // 경고용 부저
+const uint8_t PIN_BTN_START = A0;  // 빨간 버튼: 경고 수동 시작 (지금은 미연결)
+const uint8_t PIN_BTN_STOP  = A1;  // 초록 버튼: 경고 수동 종료 (지금은 미연결)
 
-// D4·D5·D7은 비어 있습니다. 센서를 4개로 늘릴 때 D4·D5를 통과 IR로 씁니다.
+// D9·D11은 센서를 4개로 늘릴 때 쓸 자리라 비워 둡니다.
+// 두 번째 스트립도 아직 없습니다(최종 구성에서 `main.ino`의 PIN_STRIP_2 사용).
 
 /* ---------------------------------------------------------------------------
-   [설정 2] 네오픽셀 스트립
-   경고 상태에서 전체가 빨간색으로 켜집니다. 방향 애니메이션은 없습니다.
+   [설정 2] 지금 없는 부품
+   --------------------------------------------------------------------------- */
+
+// 버튼을 아직 안 달았으므로 false입니다. 버튼을 A0·A1에 연결하면 true로 바꾸세요.
+// false일 때는 버튼 핀을 아예 읽지 않아, 뜬 핀 때문에 오작동하지 않습니다.
+const bool USE_BUTTONS = false;
+
+/* ---------------------------------------------------------------------------
+   [설정 3] 네오픽셀 스트립
    --------------------------------------------------------------------------- */
 
 // 스트립에 박혀 있는 낱개 LED(픽셀) 개수입니다.
 const uint16_t STRIP_PIXELS = 10;
 
-// 밝기(0~255). 전원이 부족해 색이 흔들리면 낮춥니다.
+// 밝기(0~255). 전원이 부족해 색이 흔들리거나 보드가 재부팅되면 낮춥니다.
 const uint8_t STRIP_BRIGHTNESS = 120;
 
 // 경고 색상을 빨강·초록·파랑 세기(각 0~255)로 지정합니다.
@@ -69,34 +115,60 @@ const uint8_t WARN_COLOR_G = 0;
 const uint8_t WARN_COLOR_B = 0;
 
 /* ---------------------------------------------------------------------------
-   [설정 3] 경고 출력 주기
+   [설정 4] 경고 출력 주기
    --------------------------------------------------------------------------- */
 const uint16_t WARNING_BLINK_MS = 300;      // 0.3초마다 켜짐↔꺼짐
 const uint16_t BUZZER_FREQUENCY_HZ = 1000;  // 부저 음 높이(Hz)
 
 /* ---------------------------------------------------------------------------
-   [설정 4] IR 센서 판정
-   `main.ino`와 같은 규칙입니다.
+   [설정 5] IR 센서 판정
    --------------------------------------------------------------------------- */
 
-// 많은 디지털 IR 모듈은 감지 시 LOW(0V)를 출력합니다.
-// 손을 대지 않았는데 계속 감지된다고 나오면 false로 바꿔 보세요.
+// FC-51 / HW-201 계열은 물체를 감지하면 OUT이 LOW(0V)가 되고 보드의 빨간 LED가
+// 켜집니다. 손을 대지 않았는데 계속 감지된다고 나오면 먼저 감도 나사를 조절하고,
+// 그래도 반대로 동작하면 이 값을 false로 바꿉니다.
 const bool IR_ACTIVE_LOW = true;
 
-// 출력이 오픈 컬렉터 방식이면 내부 풀업이 필요할 수 있습니다.
-const bool IR_USE_INTERNAL_PULLUP = true;
+// 이 모듈은 보드에 풀업이 이미 달려 있어 false로 두어도 됩니다.
+// 값이 제멋대로 떠다니면 true로 되돌리세요.
+const bool IR_USE_INTERNAL_PULLUP = false;
 
 // 신호가 이 시간(ms) 이상 유지되어야 감지로 확정합니다(짧은 노이즈 무시).
-const uint16_t IR_CONFIRM_MS = 80;
+// 손을 빠르게 휘저어도 안 잡히면 이 값을 40~60으로 줄이세요.
+const uint16_t IR_CONFIRM_MS = 60;
+
+/* 양쪽이 동시에 감지 중이면 누가 어디서 출발했는지 알 수 없으므로 경고를 시작하지
+   않는 보호 장치입니다.
+
+   센서를 마주보게 두었거나 두 센서가 너무 가까워서 계속 이 로그만 나온다면,
+   먼저 **센서 배치를 고치세요.** 배치를 못 고치는 상황에서 일단 시연만 해야
+   한다면 이 값을 false로 바꾸면 먼저 들어온 쪽으로 무조건 시작합니다. */
+const bool IR_AMBIGUITY_GUARD = true;
+
+// 두 IR의 현재 값을 이 간격(ms)으로 시리얼 모니터에 찍습니다.
+// 배선과 감도를 맞출 때 이 출력을 보면서 나사를 돌리면 됩니다.
+// 0을 넣으면 값 출력을 끄고 상태 변화 로그만 남깁니다.
+const uint16_t IR_LOG_INTERVAL_MS = 400;
 
 /* ---------------------------------------------------------------------------
-   [설정 5] 안전 복귀(선택 기능)
-   기본값 0은 자동 종료를 사용하지 않습니다. `main.ino`와 같은 규칙입니다.
+   [설정 6] 안전 복귀
+   버튼이 없어서 손으로 끌 방법이 없으므로, 통과 IR을 못 잡아도 이 시간이 지나면
+   자동으로 경고를 끄고 대기로 돌아갑니다. 0을 넣으면 자동 종료를 쓰지 않습니다.
+   (`main.ino`는 버튼이 있으므로 기본값이 0입니다.)
    --------------------------------------------------------------------------- */
-const uint32_t WARNING_TIMEOUT_MS = 0UL;
+const uint32_t WARNING_TIMEOUT_MS = 10000UL;  // 10초
 
 /* ---------------------------------------------------------------------------
-   [설정 6] 버튼·시리얼
+   [설정 7] 부팅 자가진단
+   전원을 켜면 스트립·LED·부저를 한 번씩 켜 봅니다. 센서를 만지기 전에 출력 배선이
+   맞는지부터 확인할 수 있습니다. 확인이 끝났으면 false로 꺼도 됩니다.
+   --------------------------------------------------------------------------- */
+const bool STARTUP_SELFTEST = true;
+const uint16_t SELFTEST_ON_MS = 700;   // 켜 두는 시간
+const uint16_t SELFTEST_END_MS = 1400; // 이 시각 이후 정상 동작 시작
+
+/* ---------------------------------------------------------------------------
+   [설정 8] 버튼·시리얼
    버튼은 INPUT_PULLUP을 쓰므로 한쪽 다리를 GND에 연결합니다(눌리면 LOW).
    --------------------------------------------------------------------------- */
 const bool BUTTON_ACTIVE_LOW = true;
@@ -119,7 +191,17 @@ enum SystemState {
   STATE_WARNING   // 경고 중: 스트립·빨간 LED·부저 작동
 };
 
+/* 양방향 처리의 핵심입니다. 보행자가 **어느 쪽에서 출발했는지**를 기억해 두었다가,
+   그 반대편 센서가 감지될 때만 "다 건넜다"고 판단합니다.
+   SIDE_NONE은 빨간 버튼으로 시작해서 출발 쪽을 모르는 경우입니다. */
+enum CrossingSide {
+  SIDE_NONE,
+  SIDE_LEFT,
+  SIDE_RIGHT
+};
+
 SystemState systemState = STATE_IDLE;
+CrossingSide startedFrom = SIDE_NONE;   // 이번 횡단이 시작된 쪽
 
 // WARNING_TIMEOUT_MS가 0이면 항상 0으로 유지되며 자동 종료를 사용하지 않습니다.
 uint32_t warningTimeoutAt = 0;
@@ -133,8 +215,8 @@ struct HoldFilter {
   uint32_t changedAt;  // 날것 값이 마지막으로 바뀐 시각
 };
 
-HoldFilter irEntry = {PIN_IR_ENTRY, false, false, 0};
-HoldFilter irExit  = {PIN_IR_EXIT,  false, false, 0};
+HoldFilter irLeft  = {PIN_IR_LEFT,  false, false, 0};
+HoldFilter irRight = {PIN_IR_RIGHT, false, false, 0};
 
 // 버튼도 채터링을 걸러야 하므로 같은 모양의 묶음을 씁니다.
 struct Button {
@@ -149,6 +231,9 @@ Button btnStop  = {PIN_BTN_STOP,  false, false, 0};  // 초록 버튼
 
 bool warningBlinkOn = false;         // 지금 점멸 출력이 켜진 상태인지
 uint32_t warningBlinkChangedAt = 0;  // 점멸 상태를 마지막으로 뒤집은 시각
+
+bool selftestDone = false;           // 부팅 자가진단이 끝났는지
+uint32_t irLoggedAt = 0;             // IR 값을 마지막으로 찍은 시각
 
 // F()와 __FlashStringHelper는 문자열을 RAM 대신 플래시 메모리에 두는 방법입니다.
 // 우노는 RAM이 2KB뿐이라 한글 로그를 많이 쓰면 금방 부족해집니다.
@@ -191,7 +276,10 @@ bool detectedEdge(HoldFilter &filter, uint32_t now) {
 }
 
 // 버튼도 같은 원리입니다. 길게 누르고 있어도 누르는 순간 한 번만 true입니다.
+// 버튼을 안 달았으면(USE_BUTTONS = false) 핀을 읽지 않고 항상 false를 돌려줍니다.
 bool buttonPressedEdge(Button &button, uint32_t now) {
+  if (!USE_BUTTONS) return false;
+
   bool raw = (digitalRead(button.pin) == LOW);
   if (!BUTTON_ACTIVE_LOW) raw = !raw;
 
@@ -239,8 +327,9 @@ void allOutputsOff() {
 }
 
 // 대기 → 경고로 넘어갈 때 해야 할 일을 모아 둔 함수입니다.
-void enterWarning(uint32_t now, const __FlashStringHelper *reason) {
+void enterWarning(uint32_t now, CrossingSide from, const __FlashStringHelper *reason) {
   systemState = STATE_WARNING;
+  startedFrom = from;
   warningBlinkChangedAt = now;
 
   if (WARNING_TIMEOUT_MS > 0) {
@@ -262,6 +351,7 @@ void enterWarning(uint32_t now, const __FlashStringHelper *reason) {
 // 경고 → 대기로 돌아갈 때의 처리입니다.
 void enterIdle(const __FlashStringHelper *reason) {
   systemState = STATE_IDLE;
+  startedFrom = SIDE_NONE;  // 다음 횡단을 위해 출발 쪽 기억을 지웁니다
   warningTimeoutAt = 0;
   allOutputsOff();
 
@@ -286,15 +376,61 @@ void updateBlinkOutputs(uint32_t now) {
   applyBlinkOutputs(!warningBlinkOn);  // ! 는 반대로 뒤집기(켜짐↔꺼짐)
 }
 
+/* 두 IR의 현재 상태를 시리얼 모니터에 찍습니다.
+   `핀값`은 digitalRead 결과 그대로(0 = LOW, 1 = HIGH),
+   `판정`은 IR_ACTIVE_LOW를 적용한 뒤의 "감지/없음"입니다.
+   손을 안 댔는데 판정이 계속 `감지`면 센서 배치나 감도 나사를 손봐야 합니다. */
+void logIrValues(uint32_t now) {
+  if (!SERIAL_DEBUG || IR_LOG_INTERVAL_MS == 0) return;
+  if ((now - irLoggedAt) < IR_LOG_INTERVAL_MS) return;
+  irLoggedAt = now;
+
+  Serial.print(F("왼쪽 D8 핀값="));
+  Serial.print(digitalRead(PIN_IR_LEFT));
+  Serial.print(readIrDetected(PIN_IR_LEFT) ? F(" 감지  ") : F(" 없음  "));
+  Serial.print(F("오른쪽 D10 핀값="));
+  Serial.print(digitalRead(PIN_IR_RIGHT));
+  Serial.print(readIrDetected(PIN_IR_RIGHT) ? F(" 감지  ") : F(" 없음  "));
+  Serial.println(systemState == STATE_WARNING ? F("[경고 중]") : F("[대기]"));
+}
+
+/* 부팅 자가진단입니다. delay()를 쓰지 않고 millis() 시각만 보고 단계를 넘깁니다.
+   아직 진단 중이면 true를 돌려주고, loop()는 거기서 바로 빠져나갑니다. */
+bool runSelftest(uint32_t now) {
+  if (!STARTUP_SELFTEST || selftestDone) return false;
+
+  if (now < SELFTEST_ON_MS) {
+    // 1단계: 스트립·LED·부저를 전부 켜서 배선이 맞는지 눈과 귀로 확인
+    applyStrip(true);
+    applyBlinkOutputs(true);
+    return true;
+  }
+
+  if (now < SELFTEST_END_MS) {
+    // 2단계: 전부 끄고 잠시 대기
+    allOutputsOff();
+    return true;
+  }
+
+  // 3단계: 진단 종료. 여기서부터 센서를 읽기 시작합니다.
+  selftestDone = true;
+  allOutputsOff();
+  logLine(F("자가진단 완료 - 지금부터 IR 센서를 읽습니다"));
+  return false;
+}
+
 // setup()은 전원을 켜거나 리셋했을 때 딱 한 번 실행됩니다.
 void setup() {
   // INPUT_PULLUP은 내부 저항을 붙여 평소 값을 HIGH로 올려 둡니다.
   uint8_t irMode = IR_USE_INTERNAL_PULLUP ? INPUT_PULLUP : INPUT;
-  pinMode(PIN_IR_ENTRY, irMode);
-  pinMode(PIN_IR_EXIT,  irMode);
+  pinMode(PIN_IR_LEFT,  irMode);
+  pinMode(PIN_IR_RIGHT, irMode);
 
-  pinMode(PIN_BTN_START, INPUT_PULLUP);
-  pinMode(PIN_BTN_STOP,  INPUT_PULLUP);
+  // 버튼을 안 달았으면 핀 설정도 하지 않습니다.
+  if (USE_BUTTONS) {
+    pinMode(PIN_BTN_START, INPUT_PULLUP);
+    pinMode(PIN_BTN_STOP,  INPUT_PULLUP);
+  }
 
   pinMode(PIN_WARN_LED, OUTPUT);
   pinMode(PIN_BUZZER,   OUTPUT);
@@ -306,8 +442,12 @@ void setup() {
 
   if (SERIAL_DEBUG) {
     Serial.begin(SERIAL_BAUD);
-    Serial.println(F("무단횡단 방지 시스템(IR 2개 축소판) 시작 - 대기 상태"));
-    Serial.println(F("진입 IR=D2, 통과 IR=D3 / 빨간 버튼 A0=시작, 초록 버튼 A1=종료"));
+    Serial.println(F("무단횡단 방지 시스템(IR 2개 축소판) 시작 - 양방향"));
+    Serial.println(F("왼쪽 IR=D8, 오른쪽 IR=D10, LED=D3, 스트립=D4, 부저=D5"));
+    if (!USE_BUTTONS) {
+      Serial.println(F("버튼 없음 - 반대편 도착 또는 자동 복귀로만 경고가 꺼집니다"));
+    }
+    Serial.println(F("두 센서를 마주보게 두지 마세요. 도로 양쪽 연석에 같은 방향으로 두세요."));
   }
 }
 
@@ -315,10 +455,15 @@ void setup() {
 void loop() {
   uint32_t now = millis();  // 한 바퀴 도는 동안 같은 시각을 쓰도록 먼저 읽어 둡니다
 
+  // 부팅 자가진단이 진행 중이면 센서를 읽지 않고 바로 빠져나갑니다.
+  if (runSelftest(now)) return;
+
+  logIrValues(now);
+
   // 조건문 안에서 읽으면 앞쪽이 true일 때 뒤쪽 필터가 갱신되지 않아
   // 상태가 어긋나므로, 두 센서를 먼저 모두 읽어 둡니다.
-  bool entryDetected = detectedEdge(irEntry, now);
-  bool exitDetected  = detectedEdge(irExit,  now);
+  bool leftEvent  = detectedEdge(irLeft,  now);
+  bool rightEvent = detectedEdge(irRight, now);
 
   bool redButtonPressed   = buttonPressedEdge(btnStart, now);
   bool greenButtonPressed = buttonPressedEdge(btnStop,  now);
@@ -326,26 +471,45 @@ void loop() {
   // 지금 상태가 무엇이냐에 따라 같은 입력도 다르게 처리합니다.
   switch (systemState) {
     case STATE_IDLE:
-      // 대기 상태에서 통과 센서 입력만 들어온 경우는 아무 일도 하지 않습니다.
       if (redButtonPressed) {
         // 빨간 버튼은 방향·센서와 무관한 강제 시작이므로 항상 우선합니다.
-        enterWarning(now, F("빨간 버튼 수동 시작"));
-      } else if (entryDetected) {
-        // 진입과 통과가 함께 감지되면 어느 상황인지 판단할 수 없으므로
-        // 켰다가 바로 끄는 동작 대신 보수적으로 시작하지 않습니다.
-        if (irExit.stable) {
-          logLine(F("입력 무시: 진입과 통과가 동시에 감지됨"));
+        // 출발 쪽을 모르므로 SIDE_NONE으로 두고, 어느 쪽 센서로든 종료되게 합니다.
+        enterWarning(now, SIDE_NONE, F("빨간 버튼 수동 시작"));
+      } else if (leftEvent && rightEvent) {
+        // 같은 순간에 양쪽이 함께 잡히면 누가 어디서 출발했는지 알 수 없습니다.
+        logLine(F("입력 무시: 양쪽이 동시에 감지됨 - 센서 배치를 확인하세요"));
+      } else if (leftEvent) {
+        // 반대쪽이 계속 감지 상태로 붙어 있으면 도착 판정을 믿을 수 없습니다.
+        if (IR_AMBIGUITY_GUARD && irRight.stable) {
+          logLine(F("입력 무시: 오른쪽이 계속 감지 중 - 센서 배치를 확인하세요"));
         } else {
-          enterWarning(now, F("진입 IR 감지"));
+          enterWarning(now, SIDE_LEFT, F("왼쪽에서 차도 진입"));
+        }
+      } else if (rightEvent) {
+        if (IR_AMBIGUITY_GUARD && irLeft.stable) {
+          logLine(F("입력 무시: 왼쪽이 계속 감지 중 - 센서 배치를 확인하세요"));
+        } else {
+          enterWarning(now, SIDE_RIGHT, F("오른쪽에서 차도 진입"));
         }
       }
       break;
 
-    case STATE_WARNING:
+    case STATE_WARNING: {
+      /* 출발한 쪽의 **반대편**이 감지될 때만 다 건넜다고 봅니다.
+         버튼으로 시작해서 출발 쪽을 모르면(SIDE_NONE) 어느 쪽이든 종료로 봅니다. */
+      bool arrived;
+      if (startedFrom == SIDE_LEFT) {
+        arrived = rightEvent;
+      } else if (startedFrom == SIDE_RIGHT) {
+        arrived = leftEvent;
+      } else {
+        arrived = leftEvent || rightEvent;
+      }
+
       // break는 switch를 빠져나가라는 뜻입니다.
       // 종료가 결정되면 아래 점멸 처리를 건너뛰어야 하므로 바로 나갑니다.
-      if (exitDetected) {
-        enterIdle(F("통과 IR 감지"));
+      if (arrived) {
+        enterIdle(F("반대편 도착 - 횡단 완료"));
         break;
       }
 
@@ -355,16 +519,21 @@ void loop() {
         break;
       }
 
-      // 경고 중 새로운 진입 감지나 빨간 버튼은 현재 경고 상태를 그대로 유지합니다.
-      if (entryDetected)    logLine(F("경고 유지: 진입 IR 재감지"));
+      // 출발한 쪽이 다시 감지되는 것은 같은 사람이 센서 앞에 머무는 경우이므로
+      // 상태를 그대로 유지합니다. 빨간 버튼 재입력도 마찬가지입니다.
+      if ((startedFrom == SIDE_LEFT && leftEvent) ||
+          (startedFrom == SIDE_RIGHT && rightEvent)) {
+        logLine(F("경고 유지: 출발한 쪽 재감지"));
+      }
       if (redButtonPressed) logLine(F("경고 유지: 빨간 버튼 재입력"));
 
       if (warningTimedOut(now)) {
-        enterIdle(F("제한시간 경과 - 선택 기능 자동 복귀"));
+        enterIdle(F("제한시간 경과 - 자동 복귀"));
         break;
       }
 
       updateBlinkOutputs(now);  // 여기까지 왔으면 경고 유지 중 → 점멸 계속
       break;
+    }
   }
 }

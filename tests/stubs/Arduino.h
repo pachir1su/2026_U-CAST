@@ -88,6 +88,15 @@ class SerialStub {
     if (ucast_stub::board.serialLogging) printf("%s\n", text);
   }
 
+  // 실제 Arduino의 Serial은 정수도 그대로 출력할 수 있습니다.
+  // 스케치가 digitalRead() 결과를 찍는 로그를 쓰므로 같은 오버로드를 둡니다.
+  void print(int value) {
+    if (ucast_stub::board.serialLogging) printf("%d", value);
+  }
+  void println(int value) {
+    if (ucast_stub::board.serialLogging) printf("%d\n", value);
+  }
+
  private:
   void emit(const __FlashStringHelper *text) {
     if (ucast_stub::board.serialLogging) {
