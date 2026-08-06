@@ -5,7 +5,7 @@
    실행 방법: tests/run-tests.sh
 
    여기서 검증하는 것은 상태 전이와 출력 논리이며,
-   실제 IR 모듈의 출력 논리나 스트립 픽셀 수 같은 실물 값은 검증하지 않습니다.
+   실제 IR 모듈의 출력 논리나 부저 음량 같은 실물 값은 검증하지 않습니다.
    ========================================================================== */
 
 #include "stubs/Arduino.h"
@@ -82,15 +82,11 @@ static bool warnLedOn() {
   return ucast_stub::board.digitalOut[PIN_WARN_LED] == HIGH;
 }
 
-static uint32_t redColor() { return strip1.Color(WARN_COLOR_R, WARN_COLOR_G, WARN_COLOR_B); }
+static uint32_t redColor() { return strip.Color(WARN_COLOR_R, WARN_COLOR_G, WARN_COLOR_B); }
 
-static bool bothStripsRed() {
-  return strip1.testAllShown(redColor()) && strip2.testAllShown(redColor());
-}
+static bool stripRed() { return strip.testAllShown(redColor()); }
 
-static bool bothStripsOff() {
-  return strip1.testAllShown(0) && strip2.testAllShown(0);
-}
+static bool stripOff() { return strip.testAllShown(0); }
 
 // 센서를 감지 → 확정 대기 → 해제 순서로 한 번 통과시킵니다.
 static void pulseIr(uint8_t pin, uint32_t holdMs) {
@@ -147,7 +143,7 @@ static void testStopByExit1() {
   startWarning();
   pulseIr(PIN_IR_EXIT_1, IR_CONFIRM_MS + 40);
   check(systemState == STATE_IDLE, "대기 상태로 복귀해야 함");
-  check(bothStripsOff(), "두 스트립이 모두 꺼져야 함");
+  check(stripOff(), "스트립이 꺼져야 함");
 }
 
 static void testStopByExit2() {
@@ -185,7 +181,7 @@ static void testIdleIgnoresGreenButton() {
   resetSystem();
   pressButton(PIN_BTN_STOP);
   check(systemState == STATE_IDLE, "대기 상태를 유지해야 함");
-  check(bothStripsOff(), "스트립이 꺼져 있어야 함");
+  check(stripOff(), "스트립이 꺼져 있어야 함");
 }
 
 static void testWarningKeepsOnEntryReentry() {
@@ -242,7 +238,7 @@ static void testHeldIrDoesNotRepeat() {
   // 두 센서가 계속 감지 상태로 유지되어도 시작/종료가 반복되지 않아야 합니다.
   advance(5000);
   check(systemState == STATE_IDLE, "감지 유지 상태에서 재시작하지 않아야 함");
-  check(bothStripsOff(), "출력이 꺼진 상태를 유지해야 함");
+  check(stripOff(), "출력이 꺼진 상태를 유지해야 함");
 }
 
 static void testShortNoiseIgnored() {
@@ -262,7 +258,7 @@ static void testEntryAndExitTogetherDoesNotStart() {
   setIr(PIN_IR_EXIT_1, true);
   advance(1000);
   check(systemState == STATE_IDLE, "모호한 입력이므로 대기를 유지해야 함");
-  check(bothStripsOff(), "스트립이 켜졌다 꺼지는 동작이 없어야 함");
+  check(stripOff(), "스트립이 켜졌다 꺼지는 동작이 없어야 함");
 }
 
 static void testRedButtonStartsDespiteAmbiguousIr() {
@@ -303,14 +299,14 @@ static void testBothExitSensorsTogether() {
    --------------------------------------------------------------------------- */
 
 static void testStripsFullRed() {
-  beginTest("17. 경고 중 두 스트립 전체 빨간색");
+  beginTest("17. 경고 중 스트립 전체 빨간색");
   resetSystem();
   startWarning();
-  check(bothStripsRed(), "스트립 1·2의 모든 픽셀이 빨간색이어야 함");
+  check(stripRed(), "스트립의 모든 픽셀이 빨간색이어야 함");
 
   // 방향 애니메이션이 없으므로 시간이 지나도 색 구성이 변하지 않아야 합니다.
   advance(2000);
-  check(bothStripsRed(), "경고 중 스트립 색이 계속 유지되어야 함");
+  check(stripRed(), "경고 중 스트립 색이 계속 유지되어야 함");
 }
 
 static void testWarnLedBlinkInterval() {
@@ -356,7 +352,7 @@ static void testAllOutputsOffOnStop() {
   startWarning();
   pressButton(PIN_BTN_STOP);
 
-  check(bothStripsOff(), "두 스트립의 모든 픽셀이 꺼져야 함");
+  check(stripOff(), "스트립의 모든 픽셀이 꺼져야 함");
   check(!warnLedOn(), "빨간 경고 LED가 꺼져야 함");
   check(!ucast_stub::board.toneOn, "부저가 꺼져야 함");
 
@@ -375,14 +371,23 @@ static void testPinAssignment() {
   check(PIN_IR_ENTRY_2 == 3, "진입 IR 2 = D3");
   check(PIN_IR_EXIT_1 == 4, "통과 IR 1 = D4");
   check(PIN_IR_EXIT_2 == 5, "통과 IR 2 = D5");
-  check(PIN_STRIP_1 == 6, "스트립 1 = D6");
-  check(PIN_STRIP_2 == 7, "스트립 2 = D7");
+  check(PIN_STRIP == 6, "스트립 = D6");
   check(PIN_WARN_LED == 8, "빨간 경고 LED = D8");
   check(PIN_BUZZER == 9, "부저 = D9");
   check(PIN_BTN_START == A0, "빨간 시작 버튼 = A0");
   check(PIN_BTN_STOP == A1, "초록 종료 버튼 = A1");
-  check(strip1.testPin() == PIN_STRIP_1, "스트립 1 객체가 D6를 사용해야 함");
-  check(strip2.testPin() == PIN_STRIP_2, "스트립 2 객체가 D7을 사용해야 함");
+  check(strip.testPin() == PIN_STRIP, "스트립 객체가 D6를 사용해야 함");
+}
+
+static void testStripPixelCount() {
+  beginTest("C. 스트립 픽셀 수 = 실물 10개");
+  check(STRIP_PIXELS == 10, "STRIP_PIXELS는 실물 스트립 LED 개수인 10이어야 함");
+  check(strip.testPixelCount() == STRIP_PIXELS, "스트립 객체가 STRIP_PIXELS개를 가져야 함");
+
+  // 마지막 픽셀(인덱스 9)까지 실제로 색이 칠해지는지 확인합니다.
+  resetSystem();
+  startWarning();
+  check(strip.testShownPixel(STRIP_PIXELS - 1) == redColor(), "마지막 픽셀도 빨간색이어야 함");
 }
 
 static void testTimeoutDisabledByDefault() {
@@ -420,6 +425,7 @@ int main() {
   testBuzzerFollowsWarnLed();
   testAllOutputsOffOnStop();
   testPinAssignment();
+  testStripPixelCount();
   testTimeoutDisabledByDefault();
 
   printf("테스트 %d개 실행, 실패 %d개\n", testsRun, testsFailed);
