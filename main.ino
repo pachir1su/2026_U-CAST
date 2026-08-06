@@ -23,8 +23,12 @@
      [경고 중]  기억해 둔 반대쪽이 감지  →  [대기]  (다 건넜다고 판단)
      [경고 중]  출발한 쪽이 다시 감지    →  경고 유지 (같은 사람이므로 무시)
 
-   경고 중에는 LED 스트립 2줄이 전체 빨간색으로 켜지고,
-   운전자 경고용 빨간 LED와 부저가 같은 주기로 점멸합니다.
+   경고 중에는 LED 스트립 2줄이 전체 빨간색으로 켜지고, 운전자 경고용 빨간 LED가
+   점멸하며, 수동(passive) 부저가 800Hz↔1800Hz를 오르내리는 사이렌 소리를 냅니다.
+   소리는 끊기지 않고 주파수만 0.5초에 걸쳐 오르고 다시 0.5초에 걸쳐 내려갑니다.
+
+   시리얼 모니터(9600 baud)에는 상태 변화 로그와 함께, IR 4개의 핀값·판정과
+   상태·출발 쪽·출력 상태가 0.4초마다 한 줄씩 계속 출력됩니다.
 
    빨간 버튼 = 경고 수동 시작, 초록 버튼 = 경고 수동 종료.
    버튼으로 시작한 경고는 출발 쪽이 없으므로 **어느 쪽 센서로도** 종료됩니다.
@@ -120,11 +124,22 @@ const uint8_t WARN_COLOR_B = 0;
    --------------------------------------------------------------------------- */
 
 // 300이면 0.3초마다 켜짐↔꺼짐이 바뀝니다(1000 = 1초).
+// 이 값은 **빨간 경고 LED 점멸**에만 쓰입니다. 부저는 아래 사이렌 설정을 따릅니다.
 const uint16_t WARNING_BLINK_MS = 300;
 
-// 부저 음의 높이(Hz). 숫자가 클수록 높은 소리입니다.
-// 소리 높이를 바꾸려면 `tone()`을 쓸 수 있는 수동(passive) 부저여야 합니다.
-const uint16_t BUZZER_FREQUENCY_HZ = 1000;
+/* 부저는 `tone()`으로 음 높이를 바꾸는 **수동(passive) 부저**를 기준으로 합니다.
+   능동(active) 부저는 안에 발진 회로가 들어 있어 전압만 걸면 정해진 한 음만
+   나므로, 아래 사이렌 설정이 소리에 반영되지 않습니다.
+
+   경고 중에는 소리를 끊지 않고 주파수만 계속 바꿉니다.
+     SIREN_MIN_HZ → SIREN_MAX_HZ 로 SIREN_SWEEP_MS 동안 상승
+     SIREN_MAX_HZ → SIREN_MIN_HZ 로 SIREN_SWEEP_MS 동안 하강  (반복)
+   주파수는 SIREN_UPDATE_MS 간격으로 조금씩 갱신하며, delay()는 쓰지 않습니다. */
+
+const uint16_t SIREN_MIN_HZ    = 800;   // 사이렌 최저 주파수
+const uint16_t SIREN_MAX_HZ    = 1800;  // 사이렌 최고 주파수
+const uint16_t SIREN_SWEEP_MS  = 500;   // 상승 한 번 / 하강 한 번에 걸리는 시간
+const uint16_t SIREN_UPDATE_MS = 25;    // 주파수를 다시 계산하는 간격(20~30ms 권장)
 
 /* ---------------------------------------------------------------------------
    [설정 4] IR 센서 판정
@@ -175,6 +190,17 @@ const uint16_t BUTTON_DEBOUNCE_MS = 40;
 // true로 두면 시리얼 모니터에 상태 변화 로그가 찍힙니다(문제 해결에 필요).
 const bool SERIAL_DEBUG = true;
 const long SERIAL_BAUD = 9600;  // 시리얼 모니터도 같은 9600으로 맞춰야 합니다
+
+// 상태 변화 로그와 별개로, 지금 값들을 이 간격(ms)마다 계속 찍습니다.
+// IR 4개의 핀값·판정, 상태, 출발 쪽, 스트립·LED·부저 상태, 자동 복귀 남은 시간을
+// 한 줄로 보여 줍니다. 배선과 감도를 맞출 때 이 줄을 보면서 나사를 돌리면 됩니다.
+// (`test/test.ino`와 같은 이름·같은 간격을 씁니다.)
+// 0을 넣으면 주기 출력을 끄고 상태 변화 로그만 남깁니다.
+// (#ifndef은 회귀 테스트가 이 값을 0으로 바꿔 "로그 끔" 동작까지 검증하기 위한
+//  것입니다. Arduino IDE에서는 항상 아래 400이 그대로 쓰입니다.)
+#ifndef IR_LOG_INTERVAL_MS
+const uint16_t IR_LOG_INTERVAL_MS = 400;
+#endif
 
 /* ===========================================================================
    아래는 동작 로직입니다. 조정값만 바꿀 때는 여기를 건드리지 않아도 됩니다.
@@ -241,8 +267,16 @@ struct Button {
 Button btnStart = {PIN_BTN_START, false, false, 0};  // 빨간 버튼
 Button btnStop  = {PIN_BTN_STOP,  false, false, 0};  // 초록 버튼
 
-bool warningBlinkOn = false;          // 지금 점멸 출력이 켜진 상태인지
+bool warningBlinkOn = false;          // 지금 빨간 경고 LED가 켜진 상태인지
 uint32_t warningBlinkChangedAt = 0;   // 점멸 상태를 마지막으로 뒤집은 시각
+
+bool buzzerOn = false;                // 지금 부저가 울리는 중인지
+bool sirenRising = true;              // 지금 구간이 상승(true)인지 하강(false)인지
+uint16_t sirenHz = 0;                 // 지금 내보내고 있는 주파수(0 = 정지)
+uint32_t sirenSweepStartedAt = 0;     // 지금 구간(상승 또는 하강)이 시작된 시각
+uint32_t sirenUpdatedAt = 0;          // 주파수를 마지막으로 갱신한 시각
+
+uint32_t irLoggedAt = 0;              // 주기 상태 로그를 마지막으로 찍은 시각
 
 // SERIAL_DEBUG가 false면 아무것도 출력하지 않도록 한 곳에 모아 둡니다.
 // __FlashStringHelper와 F()는 문자열을 RAM 대신 플래시 메모리에 두는 방법입니다.
@@ -329,21 +363,73 @@ void applyStrips(bool on) {
   }
 }
 
-// 빨간 경고 LED와 부저는 항상 같은 상태로 함께 동작합니다.
-// 둘을 따로 관리하면 타이밍이 어긋나므로 한 함수에서 같이 처리합니다.
+// 운전자 경고용 빨간 LED를 켜거나 끕니다.
+// 부저는 사이렌이라 켜짐/꺼짐이 아니라 음이 바뀌므로 따로 관리합니다.
 void applyBlinkOutputs(bool on) {
   warningBlinkOn = on;
   digitalWrite(PIN_WARN_LED, on ? HIGH : LOW);
-  if (on && BUZZER_FREQUENCY_HZ > 0) {
-    tone(PIN_BUZZER, BUZZER_FREQUENCY_HZ);  // 소리 시작(계속 울림)
-  } else {
-    noTone(PIN_BUZZER);                     // 소리 정지
+}
+
+/* 지금 구간에서 elapsed(ms)만큼 지났을 때의 주파수를 계산합니다.
+
+   실수(float) 없이 정수만 씁니다. 우노에는 부동소수점 연산 장치가 없어 float은
+   느리고 코드 크기도 커지기 때문입니다.
+     상승 구간: MIN + (MAX-MIN) * 지난시간 / 구간길이
+     하강 구간: MAX - (MAX-MIN) * 지난시간 / 구간길이 */
+uint16_t sirenFrequencyAt(uint32_t elapsed) {
+  if (elapsed > SIREN_SWEEP_MS) elapsed = SIREN_SWEEP_MS;
+
+  uint32_t span = (uint32_t)SIREN_MAX_HZ - (uint32_t)SIREN_MIN_HZ;
+  uint32_t moved = (span * elapsed) / SIREN_SWEEP_MS;
+
+  return sirenRising ? (uint16_t)(SIREN_MIN_HZ + moved)
+                     : (uint16_t)(SIREN_MAX_HZ - moved);
+}
+
+// 경고 시작 시 사이렌을 최저 주파수부터 올리기 시작합니다.
+// 시연할 때마다 같은 소리로 시작하도록 항상 상승 구간에서 출발합니다.
+void startBuzzer(uint32_t now) {
+  buzzerOn = true;
+  sirenRising = true;
+  sirenSweepStartedAt = now;
+  sirenUpdatedAt = now;
+  sirenHz = SIREN_MIN_HZ;
+  tone(PIN_BUZZER, sirenHz);
+}
+
+// 경고가 끝나면 즉시 소리를 멈춥니다.
+void stopBuzzer() {
+  buzzerOn = false;
+  sirenHz = 0;
+  noTone(PIN_BUZZER);
+}
+
+/* 사이렌은 소리를 끊지 않고 주파수만 바꿉니다. 빨간 LED 점멸과 달리 중간에
+   조용해지는 구간이 없어야 사이렌처럼 들리기 때문입니다.
+   delay()를 쓰지 않고 "마지막으로 갱신한 뒤 얼마나 지났는가"만 확인합니다.
+
+   시각 계산은 모두 뺄셈(now - 시작시각)으로 하므로, millis()가 약 49.7일마다
+   0으로 되돌아가도 결과가 어긋나지 않습니다. */
+void updateBuzzerSiren(uint32_t now) {
+  if (!buzzerOn) return;
+  if ((now - sirenUpdatedAt) < SIREN_UPDATE_MS) return;
+  sirenUpdatedAt = now;
+
+  // 한 구간이 끝났으면 방향을 뒤집습니다. loop()가 한동안 늦게 돌아
+  // 두 구간 이상을 건너뛴 경우에도 맞도록 while로 처리합니다.
+  while ((now - sirenSweepStartedAt) >= SIREN_SWEEP_MS) {
+    sirenSweepStartedAt += SIREN_SWEEP_MS;
+    sirenRising = !sirenRising;
   }
+
+  sirenHz = sirenFrequencyAt(now - sirenSweepStartedAt);
+  tone(PIN_BUZZER, sirenHz);
 }
 
 // 모든 출력을 한 번에 끕니다. 끄는 곳이 여러 군데라 함수로 묶어 둡니다.
 void allOutputsOff() {
   applyBlinkOutputs(false);
+  stopBuzzer();
   applyStrips(false);
 }
 
@@ -363,6 +449,7 @@ void enterWarning(uint32_t now, CrossingSide from, const __FlashStringHelper *re
 
   applyStrips(true);
   applyBlinkOutputs(true);
+  startBuzzer(now);
 
   if (SERIAL_DEBUG) {
     Serial.print(F("상태: 경고 시작 - "));
@@ -402,6 +489,69 @@ void updateBlinkOutputs(uint32_t now) {
   applyBlinkOutputs(!warningBlinkOn);  // ! 는 반대로 뒤집기(켜짐↔꺼짐)
 }
 
+/* 센서 하나의 원시 핀값과 판정을 `D8=1 없음` 형태로 찍습니다.
+   `핀값`은 digitalRead 결과 그대로(0 = LOW, 1 = HIGH)이고,
+   `감지/없음`은 IR_ACTIVE_LOW와 확정 시간(IR_CONFIRM_MS)까지 적용한 판정입니다. */
+void logIrSensor(const __FlashStringHelper *label, const HoldFilter &filter) {
+  Serial.print(label);
+  Serial.print(digitalRead(filter.pin));
+  Serial.print(filter.stable ? F(" 감지  ") : F(" 없음  "));
+}
+
+/* 지금 값들을 IR_LOG_INTERVAL_MS 간격으로 시리얼 모니터에 한 줄로 찍습니다.
+   loop()마다 찍으면 초당 수천 줄이 나와 모니터를 볼 수 없기 때문에 간격을 둡니다.
+   상태 전환과 오류(모호 입력 등)는 이것과 별개로 발생 즉시 따로 찍힙니다.
+
+   손을 안 댔는데 계속 `감지`로 나오면 센서 배치나 감도 나사를 손봐야 합니다. */
+void logIrValues(uint32_t now) {
+  if (!SERIAL_DEBUG || IR_LOG_INTERVAL_MS == 0) return;
+  if ((now - irLoggedAt) < IR_LOG_INTERVAL_MS) return;
+  irLoggedAt = now;
+
+  logIrSensor(F("D8="),  irLeft1);
+  logIrSensor(F("D9="),  irLeft2);
+  logIrSensor(F("D10="), irRight1);
+  logIrSensor(F("D11="), irRight2);
+
+  Serial.print(systemState == STATE_WARNING ? F("STATE_WARNING") : F("STATE_IDLE"));
+
+  Serial.print(F(" "));
+  if (startedFrom == SIDE_LEFT) {
+    Serial.print(F("SIDE_LEFT"));
+  } else if (startedFrom == SIDE_RIGHT) {
+    Serial.print(F("SIDE_RIGHT"));
+  } else {
+    Serial.print(F("SIDE_NONE"));
+  }
+
+  // 스트립과 빨간 LED는 경고 중에만 켜지므로 현재 출력값을 그대로 보여 줍니다.
+  Serial.print(systemState == STATE_WARNING ? F(" 스트립=빨강") : F(" 스트립=꺼짐"));
+  Serial.print(warningBlinkOn ? F(" LED=켜짐") : F(" LED=꺼짐"));
+
+  Serial.print(F(" 부저="));
+  if (buzzerOn) {
+    Serial.print((int)sirenHz);
+    Serial.print(F("Hz"));
+    Serial.print(sirenRising ? F("(상승)") : F("(하강)"));
+  } else {
+    Serial.print(F("꺼짐"));
+  }
+
+  // 자동 복귀는 선택 기능이라 꺼져 있을 수 있습니다. 켜져 있으면 남은 시간을 보여
+  // 줍니다. 남은 시간도 뺄셈으로 계산해 millis() 되돌아감의 영향을 받지 않습니다.
+  Serial.print(F(" 자동복귀="));
+  if (WARNING_TIMEOUT_MS == 0) {
+    Serial.println(F("사용안함"));
+  } else if (warningTimeoutAt == 0) {
+    Serial.println(F("대기중"));
+  } else {
+    int32_t remain = (int32_t)(warningTimeoutAt - now);
+    if (remain < 0) remain = 0;
+    Serial.print((int)(remain / 1000));
+    Serial.println(F("초 남음"));
+  }
+}
+
 // setup()은 전원을 켜거나 리셋했을 때 딱 한 번 실행됩니다.
 // 여기서 각 핀을 입력으로 쓸지 출력으로 쓸지 정합니다.
 void setup() {
@@ -436,6 +586,10 @@ void setup() {
     Serial.println(F("무단횡단 방지 시스템 시작 - 대기 상태 (양방향)"));
     Serial.println(F("왼쪽 IR=D8·D9, 오른쪽 IR=D10·D11, LED=D3, 스트립1=D4, 부저=D5"));
     Serial.println(F("빨간 버튼(A0)=경고 수동 시작, 초록 버튼(A1)=경고 수동 종료"));
+    Serial.println(F("부저: 수동 부저 사이렌(800Hz↔1800Hz, 상승·하강 각 0.5초)"));
+    if (IR_LOG_INTERVAL_MS > 0) {
+      Serial.println(F("0.4초마다 IR 핀값·판정과 상태·출력을 계속 출력합니다"));
+    }
     if (!STRIP_2_CONNECTED) {
       Serial.println(F("주의: PIN_STRIP_2가 0입니다. 두 번째 스트립을 건너뜁니다."));
     }
@@ -464,6 +618,9 @@ void loop() {
 
   bool redButtonPressed   = buttonPressedEdge(btnStart, now);
   bool greenButtonPressed = buttonPressedEdge(btnStop,  now);
+
+  // 센서 판정이 갱신된 뒤에 찍어야 로그와 실제 판정이 어긋나지 않습니다.
+  logIrValues(now);
 
   // 지금 상태가 무엇이냐에 따라 같은 입력도 다르게 처리합니다.
   switch (systemState) {
@@ -529,7 +686,9 @@ void loop() {
         break;
       }
 
-      updateBlinkOutputs(now);  // 여기까지 왔으면 경고 유지 중 → 점멸 계속
+      // 여기까지 왔으면 경고 유지 중 → LED 점멸과 부저 사이렌을 계속 돌립니다.
+      updateBlinkOutputs(now);
+      updateBuzzerSiren(now);
       break;
     }
   }

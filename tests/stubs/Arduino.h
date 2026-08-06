@@ -36,7 +36,8 @@ struct Board {
   uint32_t clockMs;
   uint16_t toneFreq;   // 0이면 부저 정지
   bool toneOn;
-  bool serialLogging;
+  bool serialLogging;  // true면 로그를 실제로 화면에 출력
+  uint32_t serialLines;  // println() 호출 횟수(화면 출력 여부와 무관하게 셈)
 };
 
 extern Board board;
@@ -82,10 +83,11 @@ class SerialStub {
   void print(const __FlashStringHelper *text) { emit(text); }
   void println(const __FlashStringHelper *text) {
     emit(text);
-    if (ucast_stub::board.serialLogging) printf("\n");
+    endLine();
   }
   void println(const char *text) {
-    if (ucast_stub::board.serialLogging) printf("%s\n", text);
+    if (ucast_stub::board.serialLogging) printf("%s", text);
+    endLine();
   }
 
   // 실제 Arduino의 Serial은 정수도 그대로 출력할 수 있습니다.
@@ -94,10 +96,18 @@ class SerialStub {
     if (ucast_stub::board.serialLogging) printf("%d", value);
   }
   void println(int value) {
-    if (ucast_stub::board.serialLogging) printf("%d\n", value);
+    if (ucast_stub::board.serialLogging) printf("%d", value);
+    endLine();
   }
 
  private:
+  // 로그가 몇 줄 나왔는지는 화면 출력 여부와 상관없이 세어 둡니다.
+  // 로그 간격 제한 같은 검증이 출력 설정에 좌우되지 않게 하기 위해서입니다.
+  void endLine() {
+    ucast_stub::board.serialLines++;
+    if (ucast_stub::board.serialLogging) printf("\n");
+  }
+
   void emit(const __FlashStringHelper *text) {
     if (ucast_stub::board.serialLogging) {
       printf("%s", reinterpret_cast<const char *>(text));

@@ -49,6 +49,13 @@ static void resetSystem() {
   warningBlinkOn = false;
   warningBlinkChangedAt = 0;
 
+  buzzerOn = false;
+  sirenRising = true;
+  sirenHz = 0;
+  sirenSweepStartedAt = 0;
+  sirenUpdatedAt = 0;
+  irLoggedAt = 0;
+
   irLeft1  = {PIN_IR_LEFT_1,  false, false, 0};
   irLeft2  = {PIN_IR_LEFT_2,  false, false, 0};
   irRight1 = {PIN_IR_RIGHT_1, false, false, 0};
@@ -359,22 +366,24 @@ static void testWarnLedBlinkInterval() {
   check(toggles == 3, "900ms 동안 3회 점멸 전환이 있어야 함");
 }
 
-static void testBuzzerFollowsWarnLed() {
-  beginTest("19. 부저가 설정 주기·주파수로 작동");
+static void testSirenSoundsContinuously() {
+  beginTest("19. 경고 중 사이렌이 끊기지 않고 울림");
   resetSystem();
-  pulseIr(PIN_IR_LEFT_1);
 
-  bool mismatched = false;
-  bool wrongFreq = false;
-  for (uint32_t elapsed = 0; elapsed < 1200; elapsed += 10) {
+  // 경고 시작 직후를 보기 위해 손을 대고 확정 시간만 지난 시점에서 확인합니다.
+  setIr(PIN_IR_LEFT_1, true);
+  advance(IR_CONFIRM_MS + 10);
+  check(ucast_stub::board.toneOn, "경고 시작 즉시 소리가 나야 함");
+  check(ucast_stub::board.toneFreq == SIREN_MIN_HZ, "사이렌은 최저 주파수에서 시작해야 함");
+  setIr(PIN_IR_LEFT_1, false);
+
+  // 빨간 LED는 점멸하지만 부저는 조용해지는 구간 없이 계속 울려야 합니다.
+  bool wentSilent = false;
+  for (uint32_t elapsed = 0; elapsed < 3000; elapsed += 10) {
     advance(10);
-    if (ucast_stub::board.toneOn != warnLedOn()) mismatched = true;
-    if (ucast_stub::board.toneOn && ucast_stub::board.toneFreq != BUZZER_FREQUENCY_HZ) {
-      wrongFreq = true;
-    }
+    if (!ucast_stub::board.toneOn) wentSilent = true;
   }
-  check(!mismatched, "부저는 빨간 경고 LED와 같은 주기로 동작해야 함");
-  check(!wrongFreq, "부저 주파수가 BUZZER_FREQUENCY_HZ여야 함");
+  check(!wentSilent, "경고 중에는 소리가 중간에 끊기지 않아야 함");
 }
 
 static void testAllOutputsOffOnStop() {
@@ -452,6 +461,158 @@ static void testTimeoutDisabledByDefault() {
   check(systemState == STATE_WARNING, "종료 입력 없이 자동으로 꺼지지 않아야 함");
 }
 
+/* ---------------------------------------------------------------------------
+   E~L. 부저 사이렌 (#14)
+   --------------------------------------------------------------------------- */
+
+// 사이렌 주파수를 지정한 시간 동안 훑으며 최저·최고값과 방향 전환 횟수를 셉니다.
+struct SirenScan {
+  uint16_t lowest;
+  uint16_t highest;
+  int turns;      // 상승 → 하강 또는 하강 → 상승으로 바뀐 횟수
+  bool inRange;   // 모든 표본이 SIREN_MIN_HZ ~ SIREN_MAX_HZ 안에 있었는지
+};
+
+static SirenScan scanSiren(uint32_t durationMs) {
+  SirenScan scan = {SIREN_MAX_HZ, SIREN_MIN_HZ, 0, true};
+
+  uint16_t previous = ucast_stub::board.toneFreq;
+  int direction = 0;  // +1 = 올라가는 중, -1 = 내려가는 중
+
+  for (uint32_t elapsed = 0; elapsed < durationMs; elapsed += 10) {
+    advance(10);
+    uint16_t frequency = ucast_stub::board.toneFreq;
+    if (!ucast_stub::board.toneOn) continue;
+
+    if (frequency < SIREN_MIN_HZ || frequency > SIREN_MAX_HZ) scan.inRange = false;
+    if (frequency < scan.lowest) scan.lowest = frequency;
+    if (frequency > scan.highest) scan.highest = frequency;
+
+    if (frequency != previous) {
+      int nowDirection = (frequency > previous) ? 1 : -1;
+      if (direction != 0 && nowDirection != direction) scan.turns++;
+      direction = nowDirection;
+      previous = frequency;
+    }
+  }
+  return scan;
+}
+
+static void testSirenFrequencyRange() {
+  beginTest("E. 사이렌 주파수가 최저~최고 범위를 오감");
+  resetSystem();
+  pulseIr(PIN_IR_LEFT_1);
+
+  // 한 계단에서 오르내리는 폭(약 50Hz)만큼은 양 끝에 못 미칠 수 있습니다.
+  const uint16_t step = (uint16_t)(((uint32_t)(SIREN_MAX_HZ - SIREN_MIN_HZ) *
+                                    SIREN_UPDATE_MS) / SIREN_SWEEP_MS);
+
+  SirenScan scan = scanSiren(3000);
+  check(scan.inRange, "주파수가 SIREN_MIN_HZ~SIREN_MAX_HZ를 벗어나지 않아야 함");
+  check(scan.lowest <= SIREN_MIN_HZ + step, "최저 주파수 근처까지 내려가야 함");
+  check(scan.highest >= SIREN_MAX_HZ - step, "최고 주파수 근처까지 올라가야 함");
+}
+
+static void testSirenSweepTurnsEvery500ms() {
+  beginTest("F. 상승·하강이 SIREN_SWEEP_MS마다 뒤바뀜");
+  resetSystem();
+  pulseIr(PIN_IR_LEFT_1);
+
+  // 2000ms 동안이면 500ms 구간이 4번 지나가므로 방향 전환은 3~4회입니다.
+  SirenScan scan = scanSiren(2000);
+  check(scan.turns >= 3 && scan.turns <= 4, "0.5초마다 상승↔하강이 뒤바뀌어야 함");
+}
+
+static void testSirenSurvivesMillisOverflow() {
+  beginTest("G. millis() 되돌아감(오버플로) 중에도 사이렌 유지");
+  resetSystem();
+
+  // 49.7일이 지나 millis()가 0으로 되돌아가기 직전으로 시계를 옮깁니다.
+  ucast_stub::board.clockMs = 0xFFFFF000UL;
+  pulseIr(PIN_IR_LEFT_1);
+  check(systemState == STATE_WARNING, "경고가 시작되어야 함");
+
+  SirenScan scan = scanSiren(6000);  // 되돌아가는 지점을 확실히 지나갑니다
+  check(ucast_stub::board.clockMs < 0xFFFFF000UL, "시계가 실제로 되돌아가야 함");
+  check(systemState == STATE_WARNING, "되돌아간 뒤에도 경고가 유지되어야 함");
+  check(scan.inRange, "되돌아간 뒤에도 주파수가 범위를 벗어나지 않아야 함");
+  check(scan.turns >= 8, "되돌아간 뒤에도 상승↔하강이 계속 뒤바뀌어야 함");
+}
+
+static void testSirenStopsImmediatelyOnArrival() {
+  beginTest("H. 사이렌 중 반대편 도착 → 즉시 정지");
+  resetSystem();
+  pulseIr(PIN_IR_LEFT_1);
+  advance(700);  // 하강 구간 한가운데
+  check(ucast_stub::board.toneOn, "종료 전에는 소리가 나고 있어야 함");
+
+  pulseIr(PIN_IR_RIGHT_1);
+  check(systemState == STATE_IDLE, "사이렌 중에도 반대편 도착으로 종료되어야 함");
+  check(!ucast_stub::board.toneOn, "종료 즉시 noTone()이 되어야 함");
+  check(ucast_stub::board.toneFreq == 0, "정지 후 주파수가 남아 있지 않아야 함");
+}
+
+static void testSirenStopsImmediatelyOnGreenButton() {
+  beginTest("I. 사이렌 중 초록 버튼 → 즉시 정지");
+  resetSystem();
+  pulseIr(PIN_IR_RIGHT_1);
+  advance(1300);  // 두 번째 구간 한가운데
+  check(ucast_stub::board.toneOn, "종료 전에는 소리가 나고 있어야 함");
+
+  pressButton(PIN_BTN_STOP);
+  check(systemState == STATE_IDLE, "사이렌 중에도 초록 버튼으로 종료되어야 함");
+  check(!ucast_stub::board.toneOn, "종료 즉시 noTone()이 되어야 함");
+}
+
+static void testSirenConstants() {
+  beginTest("J. 사이렌 상수 (test/test.ino와 같은 값)");
+  check(SIREN_MIN_HZ == 800, "SIREN_MIN_HZ = 800");
+  check(SIREN_MAX_HZ == 1800, "SIREN_MAX_HZ = 1800");
+  check(SIREN_SWEEP_MS == 500, "SIREN_SWEEP_MS = 500");
+  check(SIREN_UPDATE_MS >= 20 && SIREN_UPDATE_MS <= 30, "SIREN_UPDATE_MS는 20~30ms");
+  check(SIREN_MIN_HZ < SIREN_MAX_HZ, "최저 주파수가 최고 주파수보다 낮아야 함");
+}
+
+/* ---------------------------------------------------------------------------
+   K~L. 시리얼 진단 로그 (#13)
+   --------------------------------------------------------------------------- */
+
+static void testLogIsRateLimited() {
+  beginTest("K. 주기 로그가 IR_LOG_INTERVAL_MS 간격으로만 나옴");
+  resetSystem();
+
+  // 상태가 변하지 않는 대기 상태에서만 세어, 상태 전환 로그가 섞이지 않게 합니다.
+  const uint32_t before = ucast_stub::board.serialLines;
+  advance(2000);  // loop()는 10ms마다 = 200번 돕니다
+  const uint32_t lines = ucast_stub::board.serialLines - before;
+
+  if (IR_LOG_INTERVAL_MS == 0) {
+    check(lines == 0, "로그를 껐으면 주기 출력이 없어야 함");
+  } else {
+    uint32_t interval = IR_LOG_INTERVAL_MS;
+    const uint32_t expected = 2000 / interval;
+    check(lines >= expected - 1 && lines <= expected + 1,
+          "2초 동안 2000/IR_LOG_INTERVAL_MS줄 안팎이어야 함");
+    check(lines < 200, "loop()마다 출력하면 안 됨");
+  }
+}
+
+static void testLogReportsWarningState() {
+  beginTest("L. 경고 중에도 주기 로그가 계속 나옴");
+  resetSystem();
+  pulseIr(PIN_IR_LEFT_1);
+
+  const uint32_t before = ucast_stub::board.serialLines;
+  advance(2000);
+  const uint32_t lines = ucast_stub::board.serialLines - before;
+
+  if (IR_LOG_INTERVAL_MS == 0) {
+    check(lines == 0, "로그를 껐으면 경고 중에도 주기 출력이 없어야 함");
+  } else {
+    check(lines > 0, "경고 중에도 주기 로그가 나와야 함");
+  }
+}
+
 int main() {
   ucast_stub::board.serialLogging = false;
 
@@ -473,12 +634,20 @@ int main() {
   testShortNoiseIgnored();
   testStripsFullRed();
   testWarnLedBlinkInterval();
-  testBuzzerFollowsWarnLed();
+  testSirenSoundsContinuously();
   testAllOutputsOffOnStop();
   testPinAssignment();
   testSecondStripIsOptional();
   testStripPixelCount();
   testTimeoutDisabledByDefault();
+  testSirenFrequencyRange();
+  testSirenSweepTurnsEvery500ms();
+  testSirenSurvivesMillisOverflow();
+  testSirenStopsImmediatelyOnArrival();
+  testSirenStopsImmediatelyOnGreenButton();
+  testSirenConstants();
+  testLogIsRateLimited();
+  testLogReportsWarningState();
 
   printf("테스트 %d개 실행, 실패 %d개\n", testsRun, testsFailed);
   return (testsFailed == 0) ? 0 : 1;
