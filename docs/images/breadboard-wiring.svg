@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 820" width="1160" height="820" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
-  <title>진입·통과 IR 무단횡단 경고 시스템 배선도</title>
+  <title>양방향 IR 무단횡단 경고 시스템 배선도</title>
   <rect width="1160" height="820" fill="#ffffff"/>
   <text x="28" y="42" font-size="25" font-weight="bold" fill="#111827">무단횡단 방지 시스템 — 배선도</text>
-  <text x="28" y="70" font-size="14" fill="#4b5563">진입 IR 2(D2·D3) · 통과 IR 2(D4·D5) · 네오픽셀 스트립 1줄(D6) · 빨간 경고 LED(D8) · 부저(D9) · 시작 버튼(A0) · 종료 버튼(A1)</text>
+  <text x="28" y="70" font-size="14" fill="#4b5563">왼쪽 IR 2(D8·D9) · 오른쪽 IR 2(D10·D11) · 네오픽셀 스트립 2줄(D4 · 미정) · 빨간 경고 LED(D3) · 부저(D5) · 시작 버튼(A0) · 종료 버튼(A1)</text>
 
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -16,41 +16,41 @@
   <text x="580" y="332" font-size="13" fill="#ccfbf1" text-anchor="middle">USB 전원 / 로직 제어</text>
 
   <g font-size="14" fill="#ffffff">
-    <text x="472" y="375">D8</text>
-    <text x="472" y="405">D9</text>
+    <text x="472" y="375">D3</text>
+    <text x="472" y="405">D5</text>
     <text x="472" y="435">A0</text>
     <text x="472" y="465">A1</text>
     <text x="472" y="530">5V</text>
     <text x="472" y="560">GND</text>
-    <text x="688" y="375" text-anchor="end">D2</text>
-    <text x="688" y="405" text-anchor="end">D3</text>
-    <text x="688" y="435" text-anchor="end">D4</text>
-    <text x="688" y="465" text-anchor="end">D5</text>
-    <text x="688" y="520" text-anchor="end">D6</text>
+    <text x="688" y="375" text-anchor="end">D8</text>
+    <text x="688" y="405" text-anchor="end">D9</text>
+    <text x="688" y="435" text-anchor="end">D10</text>
+    <text x="688" y="465" text-anchor="end">D11</text>
+    <text x="688" y="520" text-anchor="end">D4</text>
   </g>
 
   <!-- Entry IR -->
   <rect x="750" y="100" width="380" height="145" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="940" y="130" font-size="17" font-weight="bold" fill="#7f1d1d" text-anchor="middle">진입 감지 IR 센서 2개</text>
-  <text x="775" y="162" font-size="14" font-weight="bold" fill="#b91c1c">진입 IR 1: OUT → D2</text>
-  <text x="775" y="188" font-size="14" font-weight="bold" fill="#b91c1c">진입 IR 2: OUT → D3</text>
+  <text x="940" y="130" font-size="17" font-weight="bold" fill="#7f1d1d" text-anchor="middle">왼쪽 연석 IR 센서 2개</text>
+  <text x="775" y="162" font-size="14" font-weight="bold" fill="#b91c1c">왼쪽 IR 1: OUT → D8</text>
+  <text x="775" y="188" font-size="14" font-weight="bold" fill="#b91c1c">왼쪽 IR 2: OUT → D9</text>
   <text x="775" y="214" font-size="13" fill="#991b1b">각 모듈 VCC → 5V, GND → GND</text>
-  <text x="775" y="235" font-size="12" fill="#dc2626">보행자가 차도로 들어서는 지점에 설치 · 감지 시 경고 시작</text>
+  <text x="775" y="235" font-size="12" fill="#dc2626">먼저 감지되면 여기서 출발한 것으로 보고 경고 시작</text>
 
   <!-- Exit IR -->
   <rect x="750" y="265" width="380" height="145" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-  <text x="940" y="295" font-size="17" font-weight="bold" fill="#14532d" text-anchor="middle">통과 감지 IR 센서 2개</text>
-  <text x="775" y="327" font-size="14" font-weight="bold" fill="#15803d">통과 IR 1: OUT → D4</text>
-  <text x="775" y="353" font-size="14" font-weight="bold" fill="#15803d">통과 IR 2: OUT → D5</text>
+  <text x="940" y="295" font-size="17" font-weight="bold" fill="#14532d" text-anchor="middle">오른쪽 연석 IR 센서 2개</text>
+  <text x="775" y="327" font-size="14" font-weight="bold" fill="#15803d">오른쪽 IR 1: OUT → D10</text>
+  <text x="775" y="353" font-size="14" font-weight="bold" fill="#15803d">오른쪽 IR 2: OUT → D11</text>
   <text x="775" y="379" font-size="13" fill="#166534">각 모듈 VCC → 5V, GND → GND</text>
-  <text x="775" y="400" font-size="12" fill="#16a34a">보행자가 반대편에 도착하는 지점에 설치 · 감지 시 경고 종료</text>
+  <text x="775" y="400" font-size="12" fill="#16a34a">왼쪽에서 출발했다면 여기 감지가 도착 = 경고 종료 (반대도 동일)</text>
 
   <!-- Strip -->
   <rect x="750" y="430" width="380" height="150" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="940" y="460" font-size="17" font-weight="bold" fill="#7c2d12" text-anchor="middle">네오픽셀 LED 스트립 1줄 (LED 10개)</text>
-  <text x="775" y="492" font-size="14" fill="#9a3412">스트립 DIN → D6 (330~470Ω 직렬 권장)</text>
-  <text x="775" y="518" font-size="14" fill="#9a3412">5V → 외부 5V / GND → 외부 GND</text>
-  <text x="775" y="544" font-size="13" fill="#c2410c">코드의 STRIP_PIXELS 값과 실제 LED 개수를 맞출 것</text>
+  <text x="940" y="460" font-size="17" font-weight="bold" fill="#7c2d12" text-anchor="middle">네오픽셀 LED 스트립 2줄 (각 LED 10개)</text>
+  <text x="775" y="492" font-size="14" fill="#9a3412">스트립 1 DIN → D4 · 스트립 2 DIN → 핀 미정(PIN_STRIP_2)</text>
+  <text x="775" y="518" font-size="14" fill="#9a3412">각 데이터선 330~470Ω 직렬 권장 · 5V/GND → 외부 5V 전원</text>
+  <text x="775" y="544" font-size="13" fill="#c2410c">PIN_STRIP_2가 0이면 두 번째 스트립을 건너뜁니다</text>
   <text x="775" y="567" font-size="12" font-weight="bold" fill="#b91c1c">경고 중 전체 빨간색 점등 (방향 애니메이션 없음)</text>
 
   <!-- Warn LED -->
@@ -58,12 +58,12 @@
   <text x="205" y="152" font-size="18" font-weight="bold" fill="#7f1d1d" text-anchor="middle">빨간 경고 LED (표지판 LED)</text>
   <rect x="110" y="168" width="190" height="42" rx="5" fill="#7f1d1d"/>
   <text x="205" y="196" font-size="20" font-weight="bold" fill="#fecaca" text-anchor="middle">보행자 주의</text>
-  <text x="205" y="234" font-size="13" fill="#991b1b" text-anchor="middle">D8 → 220~330Ω → LED(+) / LED(−) → GND</text>
+  <text x="205" y="234" font-size="13" fill="#991b1b" text-anchor="middle">D3 → 220~330Ω → LED(+) / LED(−) → GND</text>
 
   <!-- Buzzer -->
   <rect x="40" y="280" width="330" height="95" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
   <text x="205" y="312" font-size="17" font-weight="bold" fill="#4c1d95" text-anchor="middle">부저</text>
-  <text x="205" y="340" font-size="14" fill="#5b21b6" text-anchor="middle">(+) → D9 · (−) → GND</text>
+  <text x="205" y="340" font-size="14" fill="#5b21b6" text-anchor="middle">(+) → D5 · (−) → GND</text>
   <text x="205" y="362" font-size="12" fill="#6d28d9" text-anchor="middle">빨간 경고 LED와 같은 주기로 점멸</text>
 
   <!-- Buttons -->
@@ -97,5 +97,6 @@
     <path d="M780 580 V620 H700 V690 H760" stroke="#b91c1c" stroke-dasharray="7 5"/>
   </g>
 
-  <text x="28" y="805" font-size="12" fill="#64748b">D7은 사용하지 않습니다. A0·A1은 디지털 입력으로 사용합니다. 실제 부품의 핀 배열과 감지 논리는 제품 설명을 우선 확인하세요.</text>
+  <text x="28" y="782" font-size="12" font-weight="bold" fill="#b91c1c">⚠ IR 센서(FC-51 / HW-201 계열)는 반사형입니다. 서로 마주보게 두면 계속 감지 상태로 붙으므로 모두 같은 방향으로 설치하세요.</text>
+  <text x="28" y="805" font-size="12" fill="#64748b">A0·A1은 디지털 입력으로 사용합니다. D0·D1은 시리얼용이라 비워 둡니다. 실제 부품의 핀 배열과 감지 논리는 제품 설명을 우선 확인하세요.</text>
 </svg>
