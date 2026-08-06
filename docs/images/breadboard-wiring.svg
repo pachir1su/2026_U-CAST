@@ -2,7 +2,7 @@
   <title>진입·통과 IR 무단횡단 경고 시스템 배선도</title>
   <rect width="1160" height="820" fill="#ffffff"/>
   <text x="28" y="42" font-size="25" font-weight="bold" fill="#111827">무단횡단 방지 시스템 — 배선도</text>
-  <text x="28" y="70" font-size="14" fill="#4b5563">진입 IR 2(D2·D3) · 통과 IR 2(D4·D5) · 네오픽셀 2(D6·D7) · 빨간 경고 LED(D8) · 부저(D9) · 시작 버튼(A0) · 종료 버튼(A1)</text>
+  <text x="28" y="70" font-size="14" fill="#4b5563">진입 IR 2(D2·D3) · 통과 IR 2(D4·D5) · 네오픽셀 스트립 1줄(D6) · 빨간 경고 LED(D8) · 부저(D9) · 시작 버튼(A0) · 종료 버튼(A1)</text>
 
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -26,8 +26,7 @@
     <text x="688" y="405" text-anchor="end">D3</text>
     <text x="688" y="435" text-anchor="end">D4</text>
     <text x="688" y="465" text-anchor="end">D5</text>
-    <text x="688" y="510" text-anchor="end">D6</text>
-    <text x="688" y="540" text-anchor="end">D7</text>
+    <text x="688" y="520" text-anchor="end">D6</text>
   </g>
 
   <!-- Entry IR -->
@@ -46,12 +45,12 @@
   <text x="775" y="379" font-size="13" fill="#166534">각 모듈 VCC → 5V, GND → GND</text>
   <text x="775" y="400" font-size="12" fill="#16a34a">보행자가 반대편에 도착하는 지점에 설치 · 감지 시 경고 종료</text>
 
-  <!-- Strips -->
+  <!-- Strip -->
   <rect x="750" y="430" width="380" height="150" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="940" y="460" font-size="17" font-weight="bold" fill="#7c2d12" text-anchor="middle">네오픽셀 LED 스트립 2줄</text>
-  <text x="775" y="492" font-size="14" fill="#9a3412">스트립 1 DIN → D6 (330~470Ω 직렬 권장)</text>
-  <text x="775" y="518" font-size="14" fill="#9a3412">스트립 2 DIN → D7 (330~470Ω 직렬 권장)</text>
-  <text x="775" y="544" font-size="13" fill="#c2410c">두 스트립 5V → 외부 5V / GND → 외부 GND</text>
+  <text x="940" y="460" font-size="17" font-weight="bold" fill="#7c2d12" text-anchor="middle">네오픽셀 LED 스트립 1줄 (LED 10개)</text>
+  <text x="775" y="492" font-size="14" fill="#9a3412">스트립 DIN → D6 (330~470Ω 직렬 권장)</text>
+  <text x="775" y="518" font-size="14" fill="#9a3412">5V → 외부 5V / GND → 외부 GND</text>
+  <text x="775" y="544" font-size="13" fill="#c2410c">코드의 STRIP_PIXELS 값과 실제 LED 개수를 맞출 것</text>
   <text x="775" y="567" font-size="12" font-weight="bold" fill="#b91c1c">경고 중 전체 빨간색 점등 (방향 애니메이션 없음)</text>
 
   <!-- Warn LED -->
@@ -89,8 +88,7 @@
     <path d="M710 400 H730 V190 H750" stroke="#dc2626" marker-end="url(#arrow)"/>
     <path d="M710 430 H750" stroke="#16a34a" marker-end="url(#arrow)"/>
     <path d="M710 460 H730 V355 H750" stroke="#16a34a" marker-end="url(#arrow)"/>
-    <path d="M710 505 H735 V490 H750" stroke="#ea580c" marker-end="url(#arrow)"/>
-    <path d="M710 535 H725 V518 H750" stroke="#ea580c" marker-end="url(#arrow)"/>
+    <path d="M710 515 H735 V490 H750" stroke="#ea580c" marker-end="url(#arrow)"/>
     <path d="M450 370 H405 V205 H370" stroke="#dc2626" marker-end="url(#arrow)"/>
     <path d="M450 400 H405 V325 H370" stroke="#7c3aed" marker-end="url(#arrow)"/>
     <path d="M450 430 H400 V468 H370" stroke="#dc2626" marker-end="url(#arrow)"/>
@@ -99,5 +97,5 @@
     <path d="M780 580 V620 H700 V690 H760" stroke="#b91c1c" stroke-dasharray="7 5"/>
   </g>
 
-  <text x="28" y="805" font-size="12" fill="#64748b">A0·A1은 디지털 입력으로 사용합니다. 실제 부품의 핀 배열과 감지 논리는 제품 설명을 우선 확인하세요.</text>
+  <text x="28" y="805" font-size="12" fill="#64748b">D7은 사용하지 않습니다. A0·A1은 디지털 입력으로 사용합니다. 실제 부품의 핀 배열과 감지 논리는 제품 설명을 우선 확인하세요.</text>
 </svg>
