@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 620" width="1120" height="620" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
-  <title>IR 브레이크빔 양방향 무단횡단 경고 시스템 상태 흐름도</title>
-  <rect width="1120" height="620" fill="#ffffff"/>
-  <text x="28" y="42" font-size="24" font-weight="bold" fill="#111827">동작 상태 흐름도 — 양방향 감지</text>
-  <text x="28" y="70" font-size="14" fill="#475569">먼저 끊긴 인도 감지선을 출발지로 저장하고, 반대편 감지선이 끊기면 도착으로 종료합니다.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" width="900" height="700" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
+  <title>진입·통과 IR 무단횡단 경고 시스템 상태 흐름도</title>
+  <rect width="900" height="700" fill="#ffffff"/>
+  <text x="28" y="42" font-size="24" font-weight="bold" fill="#111827">동작 상태 흐름도 — 대기 / 경고 중</text>
+  <text x="28" y="70" font-size="14" fill="#475569">진입 감지로 경고를 시작하고, 통과 감지로 경고를 종료합니다. 횡단 방향은 판단하지 않습니다.</text>
 
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -10,49 +10,58 @@
     </marker>
   </defs>
 
-  <!-- Idle -->
-  <rect x="420" y="110" width="280" height="130" rx="14" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
-  <text x="560" y="150" font-size="22" font-weight="bold" fill="#0f172a" text-anchor="middle">대기 상태</text>
-  <text x="560" y="184" font-size="14" fill="#334155" text-anchor="middle">차도 스트립 OFF</text>
-  <text x="560" y="207" font-size="14" fill="#334155" text-anchor="middle">표지판 LED OFF · 부저 OFF</text>
-  <text x="560" y="229" font-size="12" fill="#64748b" text-anchor="middle">양쪽 감지선 입력 대기</text>
+  <!-- 대기 -->
+  <rect x="290" y="105" width="320" height="110" rx="14" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
+  <text x="450" y="145" font-size="22" font-weight="bold" fill="#0f172a" text-anchor="middle">대기</text>
+  <text x="450" y="176" font-size="14" fill="#334155" text-anchor="middle">모든 출력 꺼짐</text>
+  <text x="450" y="199" font-size="12" fill="#64748b" text-anchor="middle">진입 IR 또는 빨간 시작 버튼을 기다림</text>
 
-  <!-- LTR -->
-  <rect x="70" y="360" width="360" height="155" rx="14" fill="#fef2f2" stroke="#dc2626" stroke-width="3"/>
-  <text x="250" y="402" font-size="21" font-weight="bold" fill="#7f1d1d" text-anchor="middle">왼쪽 → 오른쪽 횡단 중</text>
-  <text x="250" y="436" font-size="14" fill="#991b1b" text-anchor="middle">도로 LED 2개 + 표지판 LED 점멸</text>
-  <text x="250" y="462" font-size="14" fill="#991b1b" text-anchor="middle">부저 간헐 경고</text>
-  <text x="250" y="488" font-size="12" fill="#b91c1c" text-anchor="middle">왼쪽 반복 입력은 무시</text>
+  <!-- 시작 조건 -->
+  <rect x="250" y="250" width="400" height="105" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="450" y="278" font-size="15" font-weight="bold" fill="#7f1d1d" text-anchor="middle">시작 조건 (하나라도 발생하면 전환)</text>
+  <text x="290" y="303" font-size="14" fill="#991b1b">├─ 진입 IR 1 (D2)</text>
+  <text x="290" y="325" font-size="14" fill="#991b1b">├─ 진입 IR 2 (D3)</text>
+  <text x="290" y="347" font-size="14" fill="#991b1b">└─ 빨간 시작 버튼 (A0)</text>
 
-  <!-- RTL -->
-  <rect x="690" y="360" width="360" height="155" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
-  <text x="870" y="402" font-size="21" font-weight="bold" fill="#1e3a8a" text-anchor="middle">오른쪽 → 왼쪽 횡단 중</text>
-  <text x="870" y="436" font-size="14" fill="#1d4ed8" text-anchor="middle">도로 LED 2개 + 표지판 LED 점멸</text>
-  <text x="870" y="462" font-size="14" fill="#1d4ed8" text-anchor="middle">부저 간헐 경고</text>
-  <text x="870" y="488" font-size="12" fill="#2563eb" text-anchor="middle">오른쪽 반복 입력은 무시</text>
+  <path d="M450 215 V250" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M450 355 V390" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow)"/>
 
-  <!-- Idle to LTR -->
-  <path d="M470 240 C390 275 315 300 270 360" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow)"/>
-  <text x="342" y="282" font-size="14" font-weight="bold" fill="#7f1d1d" text-anchor="middle">왼쪽 입력</text>
-  <text x="342" y="303" font-size="12" fill="#991b1b" text-anchor="middle">왼쪽 IR 또는 빨간 버튼</text>
+  <!-- 경고 중 -->
+  <rect x="270" y="390" width="360" height="130" rx="14" fill="#fee2e2" stroke="#b91c1c" stroke-width="3"/>
+  <text x="450" y="428" font-size="22" font-weight="bold" fill="#7f1d1d" text-anchor="middle">경고 중</text>
+  <text x="450" y="458" font-size="14" fill="#991b1b" text-anchor="middle">LED 스트립 2줄 전체 빨간색 점등</text>
+  <text x="450" y="481" font-size="14" fill="#991b1b" text-anchor="middle">빨간 경고 LED + 부저 점멸</text>
+  <text x="450" y="504" font-size="12" fill="#b91c1c" text-anchor="middle">진입 IR 재감지·빨간 버튼 재입력은 상태 유지</text>
 
-  <!-- Idle to RTL -->
-  <path d="M650 240 C730 275 805 300 850 360" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
-  <text x="778" y="282" font-size="14" font-weight="bold" fill="#1e3a8a" text-anchor="middle">오른쪽 입력</text>
-  <text x="778" y="303" font-size="12" fill="#1d4ed8" text-anchor="middle">오른쪽 IR 또는 초록 버튼</text>
+  <!-- 종료 조건 -->
+  <rect x="250" y="555" width="400" height="105" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="450" y="583" font-size="15" font-weight="bold" fill="#14532d" text-anchor="middle">종료 조건 (하나라도 발생하면 전환)</text>
+  <text x="290" y="608" font-size="14" fill="#166534">├─ 통과 IR 1 (D4)</text>
+  <text x="290" y="630" font-size="14" fill="#166534">├─ 통과 IR 2 (D5)</text>
+  <text x="290" y="652" font-size="14" fill="#166534">└─ 초록 종료 버튼 (A1)</text>
 
-  <!-- LTR to idle -->
-  <path d="M300 360 C345 300 430 280 505 240" fill="none" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)"/>
-  <text x="385" y="334" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">오른쪽 도착 입력</text>
-  <text x="385" y="352" font-size="11" fill="#475569" text-anchor="middle">최소 횡단시간 후</text>
+  <path d="M450 520 V555" fill="none" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)"/>
 
-  <!-- RTL to idle -->
-  <path d="M820 360 C775 300 690 280 615 240" fill="none" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)"/>
-  <text x="735" y="334" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="middle">왼쪽 도착 입력</text>
-  <text x="735" y="352" font-size="11" fill="#475569" text-anchor="middle">최소 횡단시간 후</text>
+  <!-- 종료 → 대기 복귀 -->
+  <path d="M650 607 H760 V160 H610" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="775" y="380" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle" transform="rotate(90 775 380)">모든 출력 소등 후 대기 복귀</text>
 
-  <!-- Notes -->
-  <rect x="70" y="550" width="980" height="48" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
-  <text x="560" y="570" font-size="13" font-weight="bold" fill="#92400e" text-anchor="middle">양쪽 입력 동시 발생은 방향 판정 불가로 무시 · 도착 신호 누락 시 CROSSING_TIMEOUT_MS 후 자동 복귀</text>
-  <text x="560" y="590" font-size="12" fill="#b45309" text-anchor="middle">버튼 색은 시작/종료가 아니라 빨강=왼쪽 IR, 초록=오른쪽 IR을 의미합니다.</text>
+  <!-- 메모 -->
+  <rect x="40" y="250" width="190" height="410" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+  <text x="135" y="278" font-size="14" font-weight="bold" fill="#92400e" text-anchor="middle">동시 입력 정책</text>
+  <text x="58" y="308" font-size="12" fill="#b45309">대기 상태에서</text>
+  <text x="58" y="328" font-size="12" fill="#b45309">진입과 통과가 함께</text>
+  <text x="58" y="348" font-size="12" fill="#b45309">감지되면 모호한 입력</text>
+  <text x="58" y="368" font-size="12" fill="#b45309">으로 보고 시작하지</text>
+  <text x="58" y="388" font-size="12" fill="#b45309">않습니다.</text>
+  <text x="58" y="422" font-size="12" fill="#b45309">대기 상태의 통과 IR과</text>
+  <text x="58" y="442" font-size="12" fill="#b45309">초록 버튼 입력은</text>
+  <text x="58" y="462" font-size="12" fill="#b45309">무시합니다.</text>
+  <text x="58" y="496" font-size="12" fill="#b45309">버튼 색의 의미</text>
+  <text x="58" y="518" font-size="12" fill="#b45309">빨강 = 경고 수동 시작</text>
+  <text x="58" y="538" font-size="12" fill="#b45309">초록 = 경고 수동 종료</text>
+  <text x="58" y="572" font-size="12" fill="#b45309">자동 종료(제한시간)는</text>
+  <text x="58" y="592" font-size="12" fill="#b45309">선택 기능이며 기본값</text>
+  <text x="58" y="612" font-size="12" fill="#b45309">WARNING_TIMEOUT_MS</text>
+  <text x="58" y="632" font-size="12" fill="#b45309">= 0 으로 꺼져 있습니다.</text>
 </svg>

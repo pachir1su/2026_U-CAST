@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 760" width="1100" height="760" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
-  <title>IR 브레이크빔 양방향 무단횡단 경고 시스템 배선도</title>
-  <rect width="1100" height="760" fill="#ffffff"/>
-  <text x="28" y="42" font-size="25" font-weight="bold" fill="#111827">IR 브레이크빔 양방향 무단횡단 경고 시스템 — 배선도</text>
-  <text x="28" y="70" font-size="14" fill="#4b5563">IR 2세트(송신부 2 + 수신부 2) · 차도 네오픽셀 2 · 보행자 주의 표지판 LED · 부저 · 좌/우 모의 버튼</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 820" width="1160" height="820" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
+  <title>진입·통과 IR 무단횡단 경고 시스템 배선도</title>
+  <rect width="1160" height="820" fill="#ffffff"/>
+  <text x="28" y="42" font-size="25" font-weight="bold" fill="#111827">무단횡단 방지 시스템 — 배선도</text>
+  <text x="28" y="70" font-size="14" fill="#4b5563">진입 IR 2(D2·D3) · 통과 IR 2(D4·D5) · 네오픽셀 2(D6·D7) · 빨간 경고 LED(D8) · 부저(D9) · 시작 버튼(A0) · 종료 버튼(A1)</text>
 
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -11,88 +11,93 @@
   </defs>
 
   <!-- Arduino -->
-  <rect x="425" y="250" width="250" height="270" rx="12" fill="#0f766e" stroke="#115e59" stroke-width="3"/>
-  <text x="550" y="288" font-size="21" font-weight="bold" fill="#ffffff" text-anchor="middle">Arduino UNO</text>
-  <text x="550" y="314" font-size="13" fill="#ccfbf1" text-anchor="middle">USB 전원 / 로직 제어</text>
+  <rect x="450" y="270" width="260" height="330" rx="12" fill="#0f766e" stroke="#115e59" stroke-width="3"/>
+  <text x="580" y="308" font-size="21" font-weight="bold" fill="#ffffff" text-anchor="middle">Arduino UNO</text>
+  <text x="580" y="332" font-size="13" fill="#ccfbf1" text-anchor="middle">USB 전원 / 로직 제어</text>
 
-  <g font-size="13" fill="#ffffff">
-    <text x="448" y="355">D8</text>
-    <text x="448" y="380">D9</text>
-    <text x="448" y="405">D10</text>
-    <text x="448" y="430">D11</text>
-    <text x="448" y="475">5V</text>
-    <text x="448" y="500">GND</text>
-    <text x="652" y="355" text-anchor="end">D2</text>
-    <text x="652" y="380" text-anchor="end">D3</text>
-    <text x="652" y="430" text-anchor="end">D6</text>
-    <text x="652" y="455" text-anchor="end">D7</text>
+  <g font-size="14" fill="#ffffff">
+    <text x="472" y="375">D8</text>
+    <text x="472" y="405">D9</text>
+    <text x="472" y="435">A0</text>
+    <text x="472" y="465">A1</text>
+    <text x="472" y="530">5V</text>
+    <text x="472" y="560">GND</text>
+    <text x="688" y="375" text-anchor="end">D2</text>
+    <text x="688" y="405" text-anchor="end">D3</text>
+    <text x="688" y="435" text-anchor="end">D4</text>
+    <text x="688" y="465" text-anchor="end">D5</text>
+    <text x="688" y="510" text-anchor="end">D6</text>
+    <text x="688" y="540" text-anchor="end">D7</text>
   </g>
 
-  <!-- Left beam -->
-  <rect x="720" y="105" width="330" height="150" rx="10" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>
-  <text x="885" y="135" font-size="17" font-weight="bold" fill="#312e81" text-anchor="middle">왼쪽 인도 IR 브레이크빔</text>
-  <text x="780" y="172" font-size="13" fill="#3730a3">송신부: VCC→5V, GND→GND</text>
-  <text x="780" y="198" font-size="13" fill="#3730a3">수신부: VCC→5V, GND→GND</text>
-  <text x="780" y="224" font-size="14" font-weight="bold" fill="#4338ca">수신부 OUT → D2</text>
-  <line x1="770" y1="242" x2="1000" y2="242" stroke="#818cf8" stroke-width="2" stroke-dasharray="8 6"/>
-  <text x="885" y="237" font-size="11" fill="#6366f1" text-anchor="middle">송신부 ─ 보행자 통과 구간 ─ 수신부</text>
+  <!-- Entry IR -->
+  <rect x="750" y="100" width="380" height="145" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="940" y="130" font-size="17" font-weight="bold" fill="#7f1d1d" text-anchor="middle">진입 감지 IR 센서 2개</text>
+  <text x="775" y="162" font-size="14" font-weight="bold" fill="#b91c1c">진입 IR 1: OUT → D2</text>
+  <text x="775" y="188" font-size="14" font-weight="bold" fill="#b91c1c">진입 IR 2: OUT → D3</text>
+  <text x="775" y="214" font-size="13" fill="#991b1b">각 모듈 VCC → 5V, GND → GND</text>
+  <text x="775" y="235" font-size="12" fill="#dc2626">보행자가 차도로 들어서는 지점에 설치 · 감지 시 경고 시작</text>
 
-  <!-- Right beam -->
-  <rect x="720" y="280" width="330" height="150" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
-  <text x="885" y="310" font-size="17" font-weight="bold" fill="#1e3a8a" text-anchor="middle">오른쪽 인도 IR 브레이크빔</text>
-  <text x="780" y="347" font-size="13" fill="#1d4ed8">송신부: VCC→5V, GND→GND</text>
-  <text x="780" y="373" font-size="13" fill="#1d4ed8">수신부: VCC→5V, GND→GND</text>
-  <text x="780" y="399" font-size="14" font-weight="bold" fill="#1d4ed8">수신부 OUT → D3</text>
-  <line x1="770" y1="417" x2="1000" y2="417" stroke="#60a5fa" stroke-width="2" stroke-dasharray="8 6"/>
-  <text x="885" y="412" font-size="11" fill="#2563eb" text-anchor="middle">송신부 ─ 보행자 통과 구간 ─ 수신부</text>
+  <!-- Exit IR -->
+  <rect x="750" y="265" width="380" height="145" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="940" y="295" font-size="17" font-weight="bold" fill="#14532d" text-anchor="middle">통과 감지 IR 센서 2개</text>
+  <text x="775" y="327" font-size="14" font-weight="bold" fill="#15803d">통과 IR 1: OUT → D4</text>
+  <text x="775" y="353" font-size="14" font-weight="bold" fill="#15803d">통과 IR 2: OUT → D5</text>
+  <text x="775" y="379" font-size="13" fill="#166534">각 모듈 VCC → 5V, GND → GND</text>
+  <text x="775" y="400" font-size="12" fill="#16a34a">보행자가 반대편에 도착하는 지점에 설치 · 감지 시 경고 종료</text>
 
   <!-- Strips -->
-  <rect x="720" y="455" width="330" height="145" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="885" y="485" font-size="17" font-weight="bold" fill="#7c2d12" text-anchor="middle">차도 네오픽셀 스트립 2개</text>
-  <text x="780" y="520" font-size="13" fill="#9a3412">스트립 1 DIN → D6</text>
-  <text x="780" y="545" font-size="13" fill="#9a3412">스트립 2 DIN → D7</text>
-  <text x="780" y="570" font-size="13" fill="#c2410c">5V → 외부 5V / GND → 외부 GND</text>
-  <text x="780" y="591" font-size="12" font-weight="bold" fill="#b91c1c">외부 GND ↔ Arduino GND 공통 접지</text>
+  <rect x="750" y="430" width="380" height="150" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="940" y="460" font-size="17" font-weight="bold" fill="#7c2d12" text-anchor="middle">네오픽셀 LED 스트립 2줄</text>
+  <text x="775" y="492" font-size="14" fill="#9a3412">스트립 1 DIN → D6 (330~470Ω 직렬 권장)</text>
+  <text x="775" y="518" font-size="14" fill="#9a3412">스트립 2 DIN → D7 (330~470Ω 직렬 권장)</text>
+  <text x="775" y="544" font-size="13" fill="#c2410c">두 스트립 5V → 외부 5V / GND → 외부 GND</text>
+  <text x="775" y="567" font-size="12" font-weight="bold" fill="#b91c1c">경고 중 전체 빨간색 점등 (방향 애니메이션 없음)</text>
 
-  <!-- Sign LED -->
-  <rect x="50" y="120" width="300" height="125" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="200" y="152" font-size="19" font-weight="bold" fill="#7f1d1d" text-anchor="middle">「보행자 주의」 표지판 LED</text>
-  <rect x="105" y="170" width="190" height="42" rx="5" fill="#7f1d1d"/>
-  <text x="200" y="198" font-size="20" font-weight="bold" fill="#fecaca" text-anchor="middle">보행자 주의</text>
-  <text x="200" y="232" font-size="13" fill="#991b1b" text-anchor="middle">D8 → 220~330Ω → 빨간 LED(+) / LED(−)→GND</text>
+  <!-- Warn LED -->
+  <rect x="40" y="120" width="330" height="130" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="205" y="152" font-size="18" font-weight="bold" fill="#7f1d1d" text-anchor="middle">빨간 경고 LED (표지판 LED)</text>
+  <rect x="110" y="168" width="190" height="42" rx="5" fill="#7f1d1d"/>
+  <text x="205" y="196" font-size="20" font-weight="bold" fill="#fecaca" text-anchor="middle">보행자 주의</text>
+  <text x="205" y="234" font-size="13" fill="#991b1b" text-anchor="middle">D8 → 220~330Ω → LED(+) / LED(−) → GND</text>
 
   <!-- Buzzer -->
-  <rect x="50" y="275" width="300" height="90" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-  <text x="200" y="307" font-size="17" font-weight="bold" fill="#4c1d95" text-anchor="middle">수동 부저</text>
-  <text x="200" y="338" font-size="14" fill="#5b21b6" text-anchor="middle">(+) → D9 · (−) → GND</text>
+  <rect x="40" y="280" width="330" height="95" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="205" y="312" font-size="17" font-weight="bold" fill="#4c1d95" text-anchor="middle">부저</text>
+  <text x="205" y="340" font-size="14" fill="#5b21b6" text-anchor="middle">(+) → D9 · (−) → GND</text>
+  <text x="205" y="362" font-size="12" fill="#6d28d9" text-anchor="middle">빨간 경고 LED와 같은 주기로 점멸</text>
 
   <!-- Buttons -->
-  <rect x="50" y="395" width="300" height="135" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-  <text x="200" y="427" font-size="17" font-weight="bold" fill="#14532d" text-anchor="middle">버튼 2개 — IR 입력 모의</text>
-  <text x="200" y="460" font-size="14" fill="#166534" text-anchor="middle">빨간 버튼: D10 ↔ GND = 왼쪽 IR</text>
-  <text x="200" y="487" font-size="14" fill="#166534" text-anchor="middle">초록 버튼: D11 ↔ GND = 오른쪽 IR</text>
-  <text x="200" y="514" font-size="12" fill="#15803d" text-anchor="middle">INPUT_PULLUP 사용 · 시작/종료 버튼이 아님</text>
+  <rect x="40" y="405" width="330" height="150" rx="10" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <text x="205" y="437" font-size="17" font-weight="bold" fill="#0f172a" text-anchor="middle">수동 조작 버튼 2개</text>
+  <rect x="62" y="452" width="286" height="34" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="205" y="475" font-size="14" font-weight="bold" fill="#7f1d1d" text-anchor="middle">빨간 버튼: A0 ↔ GND = 경고 수동 시작</text>
+  <rect x="62" y="494" width="286" height="34" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="205" y="517" font-size="14" font-weight="bold" fill="#14532d" text-anchor="middle">초록 버튼: A1 ↔ GND = 경고 수동 종료</text>
+  <text x="205" y="545" font-size="12" fill="#475569" text-anchor="middle">INPUT_PULLUP 사용 · 외부 풀업 저항 불필요</text>
 
   <!-- Power -->
-  <rect x="390" y="580" width="320" height="115" rx="10" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-  <text x="550" y="612" font-size="17" font-weight="bold" fill="#0f172a" text-anchor="middle">외부 5V 전원</text>
-  <text x="550" y="642" font-size="13" fill="#334155" text-anchor="middle">USB 보조배터리 또는 정격 5V 어댑터</text>
-  <text x="550" y="666" font-size="13" font-weight="bold" fill="#b91c1c" text-anchor="middle">9V 사각 건전지 직접 연결 금지</text>
-  <text x="550" y="687" font-size="12" fill="#334155" text-anchor="middle">스트립 GND와 Arduino GND를 공통 연결</text>
+  <rect x="400" y="650" width="360" height="130" rx="10" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <text x="580" y="682" font-size="17" font-weight="bold" fill="#0f172a" text-anchor="middle">외부 5V 전원</text>
+  <text x="580" y="710" font-size="13" fill="#334155" text-anchor="middle">USB 보조배터리 또는 정격 5V 어댑터</text>
+  <text x="580" y="734" font-size="13" font-weight="bold" fill="#b91c1c" text-anchor="middle">9V 사각 건전지 직접 연결 금지</text>
+  <text x="580" y="760" font-size="13" font-weight="bold" fill="#b91c1c" text-anchor="middle">외부 전원 GND ↔ Arduino GND 공통 접지</text>
 
   <!-- Signal wires -->
   <g fill="none" stroke-width="2.5">
-    <path d="M675 350 H720" stroke="#4f46e5" marker-end="url(#arrow)"/>
-    <path d="M675 375 H700 V380 H720" stroke="#2563eb" marker-end="url(#arrow)"/>
-    <path d="M675 425 H700 V520 H720" stroke="#ea580c" marker-end="url(#arrow)"/>
-    <path d="M675 450 H690 V545 H720" stroke="#ea580c" marker-end="url(#arrow)"/>
-    <path d="M425 350 H380 V205 H350" stroke="#dc2626" marker-end="url(#arrow)"/>
-    <path d="M425 375 H380 V320 H350" stroke="#7c3aed" marker-end="url(#arrow)"/>
-    <path d="M425 400 H380 V455 H350" stroke="#16a34a" marker-end="url(#arrow)"/>
-    <path d="M425 425 H370 V485 H350" stroke="#16a34a" marker-end="url(#arrow)"/>
-    <path d="M510 520 V580" stroke="#334155" marker-end="url(#arrow)"/>
-    <path d="M720 585 H700 V650 H710" stroke="#b91c1c" stroke-dasharray="7 5"/>
+    <path d="M710 370 H750" stroke="#dc2626" marker-end="url(#arrow)"/>
+    <path d="M710 400 H730 V190 H750" stroke="#dc2626" marker-end="url(#arrow)"/>
+    <path d="M710 430 H750" stroke="#16a34a" marker-end="url(#arrow)"/>
+    <path d="M710 460 H730 V355 H750" stroke="#16a34a" marker-end="url(#arrow)"/>
+    <path d="M710 505 H735 V490 H750" stroke="#ea580c" marker-end="url(#arrow)"/>
+    <path d="M710 535 H725 V518 H750" stroke="#ea580c" marker-end="url(#arrow)"/>
+    <path d="M450 370 H405 V205 H370" stroke="#dc2626" marker-end="url(#arrow)"/>
+    <path d="M450 400 H405 V325 H370" stroke="#7c3aed" marker-end="url(#arrow)"/>
+    <path d="M450 430 H400 V468 H370" stroke="#dc2626" marker-end="url(#arrow)"/>
+    <path d="M450 460 H390 V510 H370" stroke="#16a34a" marker-end="url(#arrow)"/>
+    <path d="M530 600 V650" stroke="#334155" marker-end="url(#arrow)"/>
+    <path d="M780 580 V620 H700 V690 H760" stroke="#b91c1c" stroke-dasharray="7 5"/>
   </g>
 
-  <text x="28" y="735" font-size="12" fill="#64748b">D4·D5는 현재 MVP에서 사용하지 않습니다. 실제 부품의 핀 배열은 제품 설명을 우선 확인하세요.</text>
+  <text x="28" y="805" font-size="12" fill="#64748b">A0·A1은 디지털 입력으로 사용합니다. 실제 부품의 핀 배열과 감지 논리는 제품 설명을 우선 확인하세요.</text>
 </svg>
