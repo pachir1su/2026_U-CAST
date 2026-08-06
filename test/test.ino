@@ -81,7 +81,7 @@
    [설정 1] 핀 번호 — 지금 브레드보드에 꽂혀 있는 그대로입니다.
    --------------------------------------------------------------------------- */
 const uint8_t PIN_IR_LEFT   = 8;   // 왼쪽 연석 IR 센서 OUT
-const uint8_t PIN_IR_RIGHT  = 10;  // 오른쪽 연석 IR 센서 OUT
+const uint8_t PIN_IR_RIGHT  = 9;  // 오른쪽 연석 IR 센서 OUT
 const uint8_t PIN_WARN_LED  = 3;   // 운전자 경고용 빨간 LED
 const uint8_t PIN_STRIP     = 4;   // 네오픽셀 LED 스트립 DIN (1줄)
 const uint8_t PIN_BUZZER    = 5;   // 경고용 부저
