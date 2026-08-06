@@ -42,11 +42,11 @@
    [설정 1] 핀 번호
    IR 2개를 제외하면 `main.ino`와 같은 배정입니다.
    --------------------------------------------------------------------------- */
-const uint8_t PIN_IR_ENTRY = 2;   // 진입 감지 IR 센서 1개
-const uint8_t PIN_IR_EXIT  = 3;   // 통과(도착) 감지 IR 센서 1개
-const uint8_t PIN_STRIP    = 6;   // 네오픽셀 LED 스트립 DIN (1줄)
-const uint8_t PIN_WARN_LED = 8;   // 운전자 경고용 빨간 LED(표지판 LED)
-const uint8_t PIN_BUZZER   = 9;   // 경고용 부저
+const uint8_t PIN_IR_ENTRY = A0;   // 진입 감지 IR 센서 1개
+const uint8_t PIN_IR_EXIT  = A1;   // 통과(도착) 감지 IR 센서 1개
+const uint8_t PIN_STRIP    = 4;   // 네오픽셀 LED 스트립 DIN (1줄)
+const uint8_t PIN_WARN_LED = 3;   // 운전자 경고용 빨간 LED(표지판 LED)
+const uint8_t PIN_BUZZER   = 5;   // 경고용 부저
 const uint8_t PIN_BTN_START = A0; // 빨간 버튼: 경고 수동 시작
 const uint8_t PIN_BTN_STOP  = A1; // 초록 버튼: 경고 수동 종료
 
