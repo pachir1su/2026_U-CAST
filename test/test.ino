@@ -47,8 +47,8 @@ const uint8_t PIN_IR_EXIT  = A1;   // 통과(도착) 감지 IR 센서 1개
 const uint8_t PIN_STRIP    = 4;   // 네오픽셀 LED 스트립 DIN (1줄)
 const uint8_t PIN_WARN_LED = 3;   // 운전자 경고용 빨간 LED(표지판 LED)
 const uint8_t PIN_BUZZER   = 5;   // 경고용 부저
-const uint8_t PIN_BTN_START = A0; // 빨간 버튼: 경고 수동 시작
-const uint8_t PIN_BTN_STOP  = A1; // 초록 버튼: 경고 수동 종료
+const uint8_t PIN_BTN_START = A4; // 빨간 버튼: 경고 수동 시작
+const uint8_t PIN_BTN_STOP  = A5; // 초록 버튼: 경고 수동 종료
 
 // D4·D5·D7은 비어 있습니다. 센서를 4개로 늘릴 때 D4·D5를 통과 IR로 씁니다.
 
