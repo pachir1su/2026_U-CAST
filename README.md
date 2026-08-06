@@ -269,6 +269,34 @@ bash tests/run-tests.sh
 이 테스트는 상태 전이와 출력 논리만 확인합니다. IR 모듈의 실제 출력 논리, 스트립
 픽셀 수, 부저 음량 같은 값은 실물에서 따로 확인해야 합니다.
 
+### Tinkercad 시뮬레이션 스케치
+
+Tinkercad에는 디지털 IR 센서 모듈이 없고 `Adafruit NeoPixel` 라이브러리도 그대로
+쓸 수 없습니다. 시뮬레이터에서 알고리즘만 확인하려고 `test/test.ino`를 따로 둡니다.
+
+| 항목 | 실물(`main.ino`) | 시뮬레이션(`test/test.ino`) |
+|---|---|---|
+| 진입 감지 | IR 2개, D2·D3 | 가변저항 2개, A0·A1 |
+| 통과 감지 | IR 2개, D4·D5 | 가변저항 2개, A2·A3 |
+| 스트립 | 2줄, D6·D7 | 1줄, D4 |
+| 빨간 경고 LED | D8 | D3 |
+| 부저 | D9 | D5 |
+| 빨간 버튼 | A0 | D9 |
+| 초록 버튼 | A1 | D10 |
+
+상태 전이 규칙과 동시 입력 정책은 두 파일이 완전히 같습니다. **알고리즘을 바꿀 때는
+두 파일을 함께 고칩니다.**
+
+가변저항은 IR 센서의 대역품입니다. 손잡이를 돌려 값이 `POT_THRESHOLD`를 넘으면
+감지로 판정합니다.
+
+> `test/test.ino`는 반드시 `test/` 폴더 안에 두어야 합니다. Arduino IDE는 한 스케치
+> 폴더 안의 모든 `.ino`를 합쳐 컴파일하므로, `main.ino` 옆에 두면 `setup()`과
+> `loop()`가 중복 정의되어 빌드가 실패합니다.
+
+- 회로 구성: [브레드보드 구성 예시(버튼 포함)](docs/images/5조%20회로%20구성%20예시_버튼%20추가.png)
+- 스키매틱: [아두이노 스키매틱](docs/images/5조%20아두이노%20스키매틱.pdf)
+
 ---
 
 ## 9. 제작 및 시연 순서
@@ -313,13 +341,18 @@ bash tests/run-tests.sh
 ├── AGENTS.md
 ├── CLAUDE.md
 ├── CHATGPT.md
+├── test/
+│   └── test.ino
 ├── docs/
 │   ├── workbook-3rd-session.md
 │   ├── assembly-guide.md
 │   ├── troubleshooting.md
 │   └── images/
 │       ├── breadboard-wiring.svg
-│       └── state-flow.svg
+│       ├── state-flow.svg
+│       ├── 5조 회로 구성 예시.png
+│       ├── 5조 회로 구성 예시_버튼 추가.png
+│       └── 5조 아두이노 스키매틱.pdf
 └── tests/
     ├── run-tests.sh
     ├── test_state_machine.cpp
