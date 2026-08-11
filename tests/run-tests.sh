@@ -20,10 +20,11 @@ build_and_run() {
   "$BUILD_DIR/$name"
 }
 
-# 1) 기본 최종판: 두 번째 스트립 핀이 아직 미정(0)
-build_and_run test_state_machine "$TESTS_DIR/test_state_machine.cpp"
+# 1) 두 번째 스트립 미연결(PIN_STRIP_2_VALUE=0) 구성 검증
+build_and_run test_state_machine_no_strip2 "$TESTS_DIR/test_state_machine.cpp" \
+  -DPIN_STRIP_2_VALUE=0
 
-# 2) 두 번째 스트립을 D6에 연결했다고 가정해 #18의 독립 스트립 제어까지 검증
+# 2) 두 번째 스트립을 D6에 연결한 현재 설정값 구성에서 #18의 독립 스트립 제어까지 검증
 build_and_run test_state_machine_two_strips "$TESTS_DIR/test_state_machine.cpp" \
   -DPIN_STRIP_2_VALUE=6
 
