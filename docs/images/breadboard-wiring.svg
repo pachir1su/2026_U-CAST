@@ -1,102 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 820" width="1160" height="820" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
-  <title>양방향 IR 무단횡단 경고 시스템 배선도</title>
-  <rect width="1160" height="820" fill="#ffffff"/>
-  <text x="28" y="42" font-size="25" font-weight="bold" fill="#111827">무단횡단 방지 시스템 — 배선도</text>
-  <text x="28" y="70" font-size="14" fill="#4b5563">왼쪽 IR 2(D8·D9) · 오른쪽 IR 2(D10·D11) · 네오픽셀 스트립 2줄(D4 · 미정) · 빨간 경고 LED(D3) · 부저(D5) · 시작 버튼(A0) · 종료 버튼(A1)</text>
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="1200" height="820" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
+  <title>멈춰 ! 독립 채널 배선도</title>
+  <rect width="1200" height="820" fill="#ffffff"/>
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0 0 L10 5 L0 10 z" fill="#475569"/>
-    </marker>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#475569"/></marker>
   </defs>
 
+  <text x="34" y="48" font-size="28" font-weight="bold" fill="#111827">멈춰 ! — 돌발 보행자 감지 및 경고 시스템 배선도</text>
+  <text x="34" y="78" font-size="15" fill="#475569">채널 1: D8 시작 / D10 끝 / D4 스트립 · 채널 2: D9 시작 / D11 끝 / 스트립2 핀 미정</text>
+
   <!-- Arduino -->
-  <rect x="450" y="270" width="260" height="330" rx="12" fill="#0f766e" stroke="#115e59" stroke-width="3"/>
-  <text x="580" y="308" font-size="21" font-weight="bold" fill="#ffffff" text-anchor="middle">Arduino UNO</text>
-  <text x="580" y="332" font-size="13" fill="#ccfbf1" text-anchor="middle">USB 전원 / 로직 제어</text>
-
-  <g font-size="14" fill="#ffffff">
-    <text x="472" y="375">D3</text>
-    <text x="472" y="405">D5</text>
-    <text x="472" y="435">A0</text>
-    <text x="472" y="465">A1</text>
-    <text x="472" y="530">5V</text>
-    <text x="472" y="560">GND</text>
-    <text x="688" y="375" text-anchor="end">D8</text>
-    <text x="688" y="405" text-anchor="end">D9</text>
-    <text x="688" y="435" text-anchor="end">D10</text>
-    <text x="688" y="465" text-anchor="end">D11</text>
-    <text x="688" y="520" text-anchor="end">D4</text>
+  <rect x="455" y="180" width="290" height="455" rx="16" fill="#0f766e" stroke="#115e59" stroke-width="3"/>
+  <text x="600" y="220" font-size="24" font-weight="bold" fill="#ffffff" text-anchor="middle">Arduino UNO</text>
+  <g font-size="15" fill="#ffffff">
+    <text x="480" y="285">D3 · 공용 LED</text>
+    <text x="480" y="320">D4 · 스트립 1</text>
+    <text x="480" y="355">D5 · 공용 부저</text>
+    <text x="480" y="390">D8 · 시작 IR 1</text>
+    <text x="480" y="425">D9 · 시작 IR 2</text>
+    <text x="480" y="460">D10 · 끝 IR 1</text>
+    <text x="480" y="495">D11 · 끝 IR 2</text>
+    <text x="480" y="530">A0 · 전체 시작</text>
+    <text x="480" y="565">A1 · 전체 종료</text>
+    <text x="480" y="600">5V / GND · 공통 전원</text>
   </g>
 
-  <!-- Entry IR -->
-  <rect x="750" y="100" width="380" height="145" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="940" y="130" font-size="17" font-weight="bold" fill="#7f1d1d" text-anchor="middle">왼쪽 연석 IR 센서 2개</text>
-  <text x="775" y="162" font-size="14" font-weight="bold" fill="#b91c1c">왼쪽 IR 1: OUT → D8</text>
-  <text x="775" y="188" font-size="14" font-weight="bold" fill="#b91c1c">왼쪽 IR 2: OUT → D9</text>
-  <text x="775" y="214" font-size="13" fill="#991b1b">각 모듈 VCC → 5V, GND → GND</text>
-  <text x="775" y="235" font-size="12" fill="#dc2626">먼저 감지되면 여기서 출발한 것으로 보고 경고 시작</text>
+  <!-- channel 1 -->
+  <rect x="40" y="135" width="350" height="310" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="3"/>
+  <text x="215" y="170" font-size="21" font-weight="bold" text-anchor="middle" fill="#1e3a8a">채널 1 세트</text>
+  <rect x="75" y="205" width="280" height="58" rx="9" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+  <text x="215" y="240" font-size="16" text-anchor="middle" fill="#1e40af">시작 IR 1 OUT → D8</text>
+  <rect x="75" y="285" width="280" height="58" rx="9" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="215" y="320" font-size="16" text-anchor="middle" fill="#991b1b">스트립 1 DIN → D4</text>
+  <rect x="75" y="365" width="280" height="58" rx="9" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="215" y="400" font-size="16" text-anchor="middle" fill="#166534">끝 IR 1 OUT → D10</text>
+  <text x="215" y="438" font-size="12" text-anchor="middle" fill="#475569">D8 감지부터 D10 감지까지 스트립 1만 점멸</text>
 
-  <!-- Exit IR -->
-  <rect x="750" y="265" width="380" height="145" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-  <text x="940" y="295" font-size="17" font-weight="bold" fill="#14532d" text-anchor="middle">오른쪽 연석 IR 센서 2개</text>
-  <text x="775" y="327" font-size="14" font-weight="bold" fill="#15803d">오른쪽 IR 1: OUT → D10</text>
-  <text x="775" y="353" font-size="14" font-weight="bold" fill="#15803d">오른쪽 IR 2: OUT → D11</text>
-  <text x="775" y="379" font-size="13" fill="#166534">각 모듈 VCC → 5V, GND → GND</text>
-  <text x="775" y="400" font-size="12" fill="#16a34a">왼쪽에서 출발했다면 여기 감지가 도착 = 경고 종료 (반대도 동일)</text>
+  <!-- channel 2 -->
+  <rect x="810" y="135" width="350" height="310" rx="14" fill="#f5f3ff" stroke="#7c3aed" stroke-width="3"/>
+  <text x="985" y="170" font-size="21" font-weight="bold" text-anchor="middle" fill="#5b21b6">채널 2 세트</text>
+  <rect x="845" y="205" width="280" height="58" rx="9" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="985" y="240" font-size="16" text-anchor="middle" fill="#5b21b6">시작 IR 2 OUT → D9</text>
+  <rect x="845" y="285" width="280" height="70" rx="9" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="985" y="315" font-size="16" text-anchor="middle" fill="#991b1b">스트립 2 DIN → 미정</text>
+  <text x="985" y="339" font-size="12" text-anchor="middle" fill="#b91c1c">PIN_STRIP_2=0이면 출력 건너뜀</text>
+  <rect x="845" y="375" width="280" height="58" rx="9" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="985" y="410" font-size="16" text-anchor="middle" fill="#166534">끝 IR 2 OUT → D11</text>
+  <text x="985" y="450" font-size="12" text-anchor="middle" fill="#475569">D9 감지부터 D11 감지까지 스트립 2만 점멸</text>
 
-  <!-- Strip -->
-  <rect x="750" y="430" width="380" height="150" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
-  <text x="940" y="460" font-size="17" font-weight="bold" fill="#7c2d12" text-anchor="middle">네오픽셀 LED 스트립 2줄 (각 LED 10개)</text>
-  <text x="775" y="492" font-size="14" fill="#9a3412">스트립 1 DIN → D4 · 스트립 2 DIN → 핀 미정(PIN_STRIP_2)</text>
-  <text x="775" y="518" font-size="14" fill="#9a3412">각 데이터선 330~470Ω 직렬 권장 · 5V/GND → 외부 5V 전원</text>
-  <text x="775" y="544" font-size="13" fill="#c2410c">PIN_STRIP_2가 0이면 두 번째 스트립을 건너뜁니다</text>
-  <text x="775" y="567" font-size="12" font-weight="bold" fill="#b91c1c">경고 중 전체 빨간색 점등 (방향 애니메이션 없음)</text>
+  <!-- shared -->
+  <rect x="55" y="505" width="330" height="185" rx="14" fill="#fff7ed" stroke="#ea580c" stroke-width="2.5"/>
+  <text x="220" y="540" font-size="19" font-weight="bold" text-anchor="middle" fill="#9a3412">공용 경고 출력</text>
+  <text x="85" y="575" font-size="15" fill="#9a3412">빨간 LED: D3 → 220~330Ω → GND</text>
+  <text x="85" y="608" font-size="15" fill="#9a3412">수동 부저: (+) D5 / (−) GND</text>
+  <text x="85" y="641" font-size="13" fill="#c2410c">하나 이상의 채널 활성 시 계속 경고</text>
+  <text x="85" y="668" font-size="13" fill="#c2410c">LED 점멸 · 부저 연속 사이렌</text>
 
-  <!-- Warn LED -->
-  <rect x="40" y="120" width="330" height="130" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="205" y="152" font-size="18" font-weight="bold" fill="#7f1d1d" text-anchor="middle">빨간 경고 LED (표지판 LED)</text>
-  <rect x="110" y="168" width="190" height="42" rx="5" fill="#7f1d1d"/>
-  <text x="205" y="196" font-size="20" font-weight="bold" fill="#fecaca" text-anchor="middle">보행자 주의</text>
-  <text x="205" y="234" font-size="13" fill="#991b1b" text-anchor="middle">D3 → 220~330Ω → LED(+) / LED(−) → GND</text>
+  <rect x="815" y="505" width="330" height="185" rx="14" fill="#f8fafc" stroke="#334155" stroke-width="2.5"/>
+  <text x="980" y="540" font-size="19" font-weight="bold" text-anchor="middle" fill="#0f172a">수동 버튼</text>
+  <text x="845" y="578" font-size="15" fill="#991b1b">빨간 버튼: A0 ↔ GND</text>
+  <text x="845" y="607" font-size="13" fill="#475569">→ 두 채널 수동 시작</text>
+  <text x="845" y="642" font-size="15" fill="#166534">초록 버튼: A1 ↔ GND</text>
+  <text x="845" y="671" font-size="13" fill="#475569">→ 두 채널 수동 종료</text>
 
-  <!-- Buzzer -->
-  <rect x="40" y="280" width="330" height="95" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-  <text x="205" y="312" font-size="17" font-weight="bold" fill="#4c1d95" text-anchor="middle">부저</text>
-  <text x="205" y="340" font-size="14" fill="#5b21b6" text-anchor="middle">(+) → D5 · (−) → GND</text>
-  <text x="205" y="362" font-size="12" fill="#6d28d9" text-anchor="middle">빨간 경고 LED와 같은 주기로 점멸</text>
+  <!-- power -->
+  <rect x="430" y="675" width="340" height="105" rx="12" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
+  <text x="600" y="710" font-size="18" font-weight="bold" text-anchor="middle" fill="#0f172a">5V 외부 전원</text>
+  <text x="600" y="740" font-size="13" text-anchor="middle" fill="#334155">스트립 5V/GND · IR VCC/GND</text>
+  <text x="600" y="765" font-size="13" font-weight="bold" text-anchor="middle" fill="#b91c1c">Arduino GND와 반드시 공통 접지</text>
 
-  <!-- Buttons -->
-  <rect x="40" y="405" width="330" height="150" rx="10" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-  <text x="205" y="437" font-size="17" font-weight="bold" fill="#0f172a" text-anchor="middle">수동 조작 버튼 2개</text>
-  <rect x="62" y="452" width="286" height="34" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
-  <text x="205" y="475" font-size="14" font-weight="bold" fill="#7f1d1d" text-anchor="middle">빨간 버튼: A0 ↔ GND = 경고 수동 시작</text>
-  <rect x="62" y="494" width="286" height="34" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
-  <text x="205" y="517" font-size="14" font-weight="bold" fill="#14532d" text-anchor="middle">초록 버튼: A1 ↔ GND = 경고 수동 종료</text>
-  <text x="205" y="545" font-size="12" fill="#475569" text-anchor="middle">INPUT_PULLUP 사용 · 외부 풀업 저항 불필요</text>
+  <path d="M390 314 H455" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <path d="M810 320 H745" stroke="#dc2626" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <path d="M600 635 V675" stroke="#334155" stroke-width="2.5" marker-end="url(#arrow)"/>
 
-  <!-- Power -->
-  <rect x="400" y="650" width="360" height="130" rx="10" fill="#f8fafc" stroke="#334155" stroke-width="2"/>
-  <text x="580" y="682" font-size="17" font-weight="bold" fill="#0f172a" text-anchor="middle">외부 5V 전원</text>
-  <text x="580" y="710" font-size="13" fill="#334155" text-anchor="middle">USB 보조배터리 또는 정격 5V 어댑터</text>
-  <text x="580" y="734" font-size="13" font-weight="bold" fill="#b91c1c" text-anchor="middle">9V 사각 건전지 직접 연결 금지</text>
-  <text x="580" y="760" font-size="13" font-weight="bold" fill="#b91c1c" text-anchor="middle">외부 전원 GND ↔ Arduino GND 공통 접지</text>
-
-  <!-- Signal wires -->
-  <g fill="none" stroke-width="2.5">
-    <path d="M710 370 H750" stroke="#dc2626" marker-end="url(#arrow)"/>
-    <path d="M710 400 H730 V190 H750" stroke="#dc2626" marker-end="url(#arrow)"/>
-    <path d="M710 430 H750" stroke="#16a34a" marker-end="url(#arrow)"/>
-    <path d="M710 460 H730 V355 H750" stroke="#16a34a" marker-end="url(#arrow)"/>
-    <path d="M710 515 H735 V490 H750" stroke="#ea580c" marker-end="url(#arrow)"/>
-    <path d="M450 370 H405 V205 H370" stroke="#dc2626" marker-end="url(#arrow)"/>
-    <path d="M450 400 H405 V325 H370" stroke="#7c3aed" marker-end="url(#arrow)"/>
-    <path d="M450 430 H400 V468 H370" stroke="#dc2626" marker-end="url(#arrow)"/>
-    <path d="M450 460 H390 V510 H370" stroke="#16a34a" marker-end="url(#arrow)"/>
-    <path d="M530 600 V650" stroke="#334155" marker-end="url(#arrow)"/>
-    <path d="M780 580 V620 H700 V690 H760" stroke="#b91c1c" stroke-dasharray="7 5"/>
-  </g>
-
-  <text x="28" y="782" font-size="12" font-weight="bold" fill="#b91c1c">⚠ IR 센서(FC-51 / HW-201 계열)는 반사형입니다. 서로 마주보게 두면 계속 감지 상태로 붙으므로 모두 같은 방향으로 설치하세요.</text>
-  <text x="28" y="805" font-size="12" fill="#64748b">A0·A1은 디지털 입력으로 사용합니다. D0·D1은 시리얼용이라 비워 둡니다. 실제 부품의 핀 배열과 감지 논리는 제품 설명을 우선 확인하세요.</text>
+  <text x="34" y="808" font-size="12" fill="#64748b">※ 스트립 2 실제 DIN 핀은 아직 확정하지 않았습니다. 자동 테스트의 임시 핀 값은 실제 배선 결정으로 간주하지 마세요.</text>
 </svg>
