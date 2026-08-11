@@ -1,67 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" width="900" height="700" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
-  <title>양방향 IR 무단횡단 경고 시스템 상태 흐름도</title>
-  <rect width="900" height="700" fill="#ffffff"/>
-  <text x="28" y="42" font-size="24" font-weight="bold" fill="#111827">동작 상태 흐름도 — 대기 / 경고 중 (양방향)</text>
-  <text x="28" y="70" font-size="14" fill="#475569">먼저 감지된 쪽에서 경고를 시작하고, 그 반대편이 감지되면 종료합니다. 어느 방향이든 동작합니다.</text>
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 720" width="1100" height="720" font-family="Malgun Gothic, Noto Sans KR, sans-serif">
+  <title>멈춰 ! 독립 채널 동작 흐름도</title>
+  <rect width="1100" height="720" fill="#ffffff"/>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 L10 5 L0 10 z" fill="#334155"/>
     </marker>
   </defs>
 
-  <!-- 대기 -->
-  <rect x="290" y="105" width="320" height="110" rx="14" fill="#f1f5f9" stroke="#334155" stroke-width="3"/>
-  <text x="450" y="145" font-size="22" font-weight="bold" fill="#0f172a" text-anchor="middle">대기</text>
-  <text x="450" y="176" font-size="14" fill="#334155" text-anchor="middle">모든 출력 꺼짐</text>
-  <text x="450" y="199" font-size="12" fill="#64748b" text-anchor="middle">양쪽 IR 또는 빨간 시작 버튼을 기다림</text>
+  <text x="36" y="48" font-size="27" font-weight="bold" fill="#111827">멈춰 ! — 독립 채널 동작 흐름도</text>
+  <text x="36" y="78" font-size="15" fill="#475569">시작 IR · 끝 IR · LED 스트립 한 세트가 자기 채널만 제어합니다. 두 채널은 동시에 작동할 수 있습니다.</text>
 
-  <!-- 시작 조건 -->
-  <rect x="250" y="250" width="400" height="105" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="450" y="278" font-size="15" font-weight="bold" fill="#7f1d1d" text-anchor="middle">시작 조건 (하나라도 발생하면 전환)</text>
-  <text x="290" y="303" font-size="14" fill="#991b1b">├─ 왼쪽 IR (D8·D9)  → 출발=왼쪽</text>
-  <text x="290" y="325" font-size="14" fill="#991b1b">├─ 오른쪽 IR (D10·D11) → 출발=오른쪽</text>
-  <text x="290" y="347" font-size="14" fill="#991b1b">└─ 빨간 시작 버튼 (A0)</text>
+  <!-- channel 1 -->
+  <rect x="45" y="120" width="480" height="400" rx="16" fill="#f8fafc" stroke="#2563eb" stroke-width="3"/>
+  <text x="285" y="155" font-size="22" font-weight="bold" text-anchor="middle" fill="#1e3a8a">채널 1</text>
+  <rect x="85" y="190" width="180" height="76" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="175" y="220" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e40af">시작 IR 1 · D8</text>
+  <text x="175" y="244" font-size="13" text-anchor="middle" fill="#1d4ed8">감지 → 채널 1 시작</text>
+  <path d="M265 228 H335" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="340" y="175" width="145" height="108" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="412" y="208" font-size="16" font-weight="bold" text-anchor="middle" fill="#991b1b">스트립 1 · D4</text>
+  <text x="412" y="233" font-size="14" text-anchor="middle" fill="#b91c1c">빨간색 점멸</text>
+  <text x="412" y="257" font-size="13" text-anchor="middle" fill="#b91c1c">300ms ON↔OFF</text>
+  <path d="M412 283 V340" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="315" y="345" width="195" height="76" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="412" y="375" font-size="16" font-weight="bold" text-anchor="middle" fill="#166534">끝 IR 1 · D10</text>
+  <text x="412" y="399" font-size="13" text-anchor="middle" fill="#15803d">감지 → 채널 1 종료</text>
+  <text x="285" y="475" font-size="14" text-anchor="middle" fill="#475569">채널 2 상태와 무관하게 시작·종료</text>
 
-  <path d="M450 215 V250" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow)"/>
-  <path d="M450 355 V390" fill="none" stroke="#dc2626" stroke-width="3" marker-end="url(#arrow)"/>
+  <!-- channel 2 -->
+  <rect x="575" y="120" width="480" height="400" rx="16" fill="#f8fafc" stroke="#7c3aed" stroke-width="3"/>
+  <text x="815" y="155" font-size="22" font-weight="bold" text-anchor="middle" fill="#5b21b6">채널 2</text>
+  <rect x="615" y="190" width="180" height="76" rx="12" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="705" y="220" font-size="16" font-weight="bold" text-anchor="middle" fill="#5b21b6">시작 IR 2 · D9</text>
+  <text x="705" y="244" font-size="13" text-anchor="middle" fill="#6d28d9">감지 → 채널 2 시작</text>
+  <path d="M795 228 H865" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="870" y="175" width="145" height="108" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+  <text x="942" y="208" font-size="16" font-weight="bold" text-anchor="middle" fill="#991b1b">스트립 2</text>
+  <text x="942" y="233" font-size="14" text-anchor="middle" fill="#b91c1c">빨간색 점멸</text>
+  <text x="942" y="257" font-size="12" text-anchor="middle" fill="#b91c1c">DIN 핀 미정</text>
+  <path d="M942 283 V340" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="845" y="345" width="195" height="76" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+  <text x="942" y="375" font-size="16" font-weight="bold" text-anchor="middle" fill="#166534">끝 IR 2 · D11</text>
+  <text x="942" y="399" font-size="13" text-anchor="middle" fill="#15803d">감지 → 채널 2 종료</text>
+  <text x="815" y="475" font-size="14" text-anchor="middle" fill="#475569">채널 1 상태와 무관하게 시작·종료</text>
 
-  <!-- 경고 중 -->
-  <rect x="270" y="390" width="360" height="130" rx="14" fill="#fee2e2" stroke="#b91c1c" stroke-width="3"/>
-  <text x="450" y="428" font-size="22" font-weight="bold" fill="#7f1d1d" text-anchor="middle">경고 중</text>
-  <text x="450" y="458" font-size="14" fill="#991b1b" text-anchor="middle">LED 스트립 2줄 전체 빨간색 점등</text>
-  <text x="450" y="481" font-size="14" fill="#991b1b" text-anchor="middle">빨간 경고 LED + 부저 점멸</text>
-  <text x="450" y="504" font-size="12" fill="#b91c1c" text-anchor="middle">출발한 쪽 재감지·빨간 버튼 재입력은 상태 유지</text>
+  <!-- shared outputs -->
+  <rect x="170" y="560" width="760" height="115" rx="15" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+  <text x="550" y="592" font-size="19" font-weight="bold" text-anchor="middle" fill="#9a3412">공용 경고 출력 — 하나 이상의 채널이 활성일 때</text>
+  <text x="550" y="622" font-size="15" text-anchor="middle" fill="#c2410c">빨간 경고 LED(D3): 300ms 점멸 · 수동 부저(D5): 800↔1800Hz 연속 사이렌</text>
+  <text x="550" y="650" font-size="13" text-anchor="middle" fill="#9a3412">한 채널이 끝나도 다른 채널이 활성이라면 공용 경고는 계속 유지됩니다.</text>
 
-  <!-- 종료 조건 -->
-  <rect x="250" y="555" width="400" height="105" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-  <text x="450" y="583" font-size="15" font-weight="bold" fill="#14532d" text-anchor="middle">종료 조건 (하나라도 발생하면 전환)</text>
-  <text x="290" y="608" font-size="14" fill="#166534">├─ 출발 쪽의 반대편 IR</text>
-  <text x="290" y="630" font-size="14" fill="#166534">├─ (출발 쪽 재감지는 무시)</text>
-  <text x="290" y="652" font-size="14" fill="#166534">└─ 초록 종료 버튼 (A1)</text>
-
-  <path d="M450 520 V555" fill="none" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)"/>
-
-  <!-- 종료 → 대기 복귀 -->
-  <path d="M650 607 H760 V160 H610" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
-  <text x="775" y="380" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle" transform="rotate(90 775 380)">모든 출력 소등 후 대기 복귀</text>
-
-  <!-- 메모 -->
-  <rect x="40" y="250" width="190" height="410" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
-  <text x="135" y="278" font-size="14" font-weight="bold" fill="#92400e" text-anchor="middle">동시 입력 정책</text>
-  <text x="58" y="308" font-size="12" fill="#b45309">대기 상태에서</text>
-  <text x="58" y="328" font-size="12" fill="#b45309">양쪽이 함께</text>
-  <text x="58" y="348" font-size="12" fill="#b45309">감지되면 모호한 입력</text>
-  <text x="58" y="368" font-size="12" fill="#b45309">으로 보고 시작하지</text>
-  <text x="58" y="388" font-size="12" fill="#b45309">않습니다.</text>
-  <text x="58" y="422" font-size="12" fill="#b45309">대기 상태의 초록</text>
-  <text x="58" y="442" font-size="12" fill="#b45309">버튼 입력은</text>
-  <text x="58" y="462" font-size="12" fill="#b45309">무시합니다.</text>
-  <text x="58" y="496" font-size="12" fill="#b45309">버튼 색의 의미</text>
-  <text x="58" y="518" font-size="12" fill="#b45309">빨강 = 경고 수동 시작</text>
-  <text x="58" y="538" font-size="12" fill="#b45309">초록 = 경고 수동 종료</text>
-  <text x="58" y="572" font-size="12" fill="#b45309">자동 종료(제한시간)는</text>
-  <text x="58" y="592" font-size="12" fill="#b45309">선택 기능이며 기본값</text>
-  <text x="58" y="612" font-size="12" fill="#b45309">WARNING_TIMEOUT_MS</text>
-  <text x="58" y="632" font-size="12" fill="#b45309">= 0 으로 꺼져 있습니다.</text>
+  <path d="M285 520 V560" stroke="#2563eb" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <path d="M815 520 V560" stroke="#7c3aed" stroke-width="2.5" marker-end="url(#arrow)"/>
 </svg>
