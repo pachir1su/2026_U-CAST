@@ -40,6 +40,7 @@ const uint8_t PIN_IR_EXIT_2  = 11;  // 채널 2 끝 IR
 const uint8_t PIN_WARN_LED   = 3;   // 공용 빨간 경고 LED
 const uint8_t PIN_STRIP_1    = 4;   // 채널 1 네오픽셀 DIN
 const uint8_t PIN_BUZZER     = 5;   // 공용 수동 부저
+const uint8_t PIN_STRIP_2    = 6;   // 채널 2 네오픽셀 DIN
 const uint8_t PIN_BTN_START  = A0;  // 빨간 버튼: 두 채널 수동 시작
 const uint8_t PIN_BTN_STOP   = A1;  // 초록 버튼: 두 채널 수동 종료
 
