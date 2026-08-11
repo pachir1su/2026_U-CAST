@@ -23,8 +23,8 @@
    빨간 버튼은 두 채널을 모두 수동 시작하고, 초록 버튼은 두 채널을 모두 수동 종료합니다.
    `delay()`는 사용하지 않습니다. 센서·버튼·점멸·사이렌은 모두 millis() 기반입니다.
 
-   두 번째 스트립의 실제 DIN 핀이 아직 확정되지 않았으므로 PIN_STRIP_2 기본값은 0입니다.
-   최종 배선이 확정되면 [설정 1]의 PIN_STRIP_2_VALUE만 실제 핀 번호로 바꾸세요.
+   두 번째 스트립 DIN은 PIN_STRIP_2_VALUE 한 곳에서만 설정합니다.
+   나중에 핀을 바꿀 때는 [설정 1]의 PIN_STRIP_2_VALUE 숫자만 바꾸세요.
    ========================================================================== */
 
 #include <Adafruit_NeoPixel.h>
@@ -40,14 +40,13 @@ const uint8_t PIN_IR_EXIT_2  = 11;  // 채널 2 끝 IR
 const uint8_t PIN_WARN_LED   = 3;   // 공용 빨간 경고 LED
 const uint8_t PIN_STRIP_1    = 4;   // 채널 1 네오픽셀 DIN
 const uint8_t PIN_BUZZER     = 5;   // 공용 수동 부저
-const uint8_t PIN_STRIP_2    = 6;   // 채널 2 네오픽셀 DIN
 const uint8_t PIN_BTN_START  = A0;  // 빨간 버튼: 두 채널 수동 시작
 const uint8_t PIN_BTN_STOP   = A1;  // 초록 버튼: 두 채널 수동 종료
 
-// 실물 핀이 확정되면 0 대신 실제 핀을 적습니다.
+// ★ 두 번째 네오픽셀 DIN 핀: 앞으로 이 숫자 하나만 바꾸면 됩니다.
 // PC 회귀 테스트는 -DPIN_STRIP_2_VALUE=6 같은 방식으로 2번 스트립 연결 상태도 검증합니다.
 #ifndef PIN_STRIP_2_VALUE
-#define PIN_STRIP_2_VALUE 0
+#define PIN_STRIP_2_VALUE 6
 #endif
 const uint8_t PIN_STRIP_2 = PIN_STRIP_2_VALUE;
 const bool STRIP_2_CONNECTED = (PIN_STRIP_2 != 0);
